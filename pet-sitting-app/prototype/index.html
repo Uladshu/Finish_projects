@@ -58,6 +58,13 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .chip.flat[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); opacity: 1; }
 .chip.flat[aria-pressed="false"] { opacity: 1; color: var(--muted); }
 .search { display: flex; gap: 6px; }
+.fbtn { flex: none; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--panel); border-radius: 10px; padding: 7px 11px; font-weight: 600; font-size: 14px; cursor: pointer; }
+.fbtn svg { width: 16px; height: 16px; fill: currentColor; }
+.fbtn b { display: grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-size: 11px; }
+.fbtn[aria-expanded="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+.fpanel { display: grid; gap: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg); }
+.factions { display: flex; gap: 8px; justify-content: space-between; }
+.factions .btn.primary { flex: 1; }
 .search input { flex: 1; min-width: 0; border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 8px 11px; font-size: 14px; }
 .count { font-size: 12px; color: var(--muted); }
 .scroll { overflow-y: auto; min-height: 0; flex: 1; padding-block: 6px 90px; padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: 12px; }
@@ -220,7 +227,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .loading { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-weight: 600; z-index: 1; pointer-events: none; }
 
 @media (max-width: 760px) {
-  .app { grid-template-columns: 1fr; grid-template-rows: 50% 50%; }
+  .app { grid-template-columns: 1fr; grid-template-rows: 56% 44%; }
   .mapwrap { grid-row: 1; } .panel { grid-row: 2; border-right: 0; border-top: 1px solid var(--line); }
   .head { padding-right: max(16px, env(safe-area-inset-right, 0px)); gap: 8px; }
   .scroll { padding-right: max(12px, env(safe-area-inset-right, 0px)); padding-bottom: 24px; }
@@ -228,6 +235,11 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   .fabs { bottom: 12px; } .fab { padding: 10px 14px; font-size: 14px; }
   .sheet { top: auto; bottom: 8px; max-height: 85%; }
   .grid2 { grid-template-columns: 1fr; }
+  .fpanel { position: fixed; left: 0; right: 0; bottom: 0; z-index: 1500; max-height: 80vh; overflow-y: auto; border: 0; border-radius: 18px 18px 0 0; background: var(--panel); box-shadow: 0 -8px 30px rgba(0,0,0,.25);
+    padding-block: 16px calc(12px + env(safe-area-inset-bottom, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .fpanel .species { grid-template-columns: repeat(4, 1fr); overflow: visible; gap: 6px; }
+  .fpanel .sp { font-size: 12px; padding: 8px 2px 6px; } .fpanel .sp svg { width: 24px; height: 24px; }
+  .factions { position: sticky; bottom: calc(-12px - env(safe-area-inset-bottom, 0px)); background: var(--panel); padding-block: 10px 4px; }
 }
 </style>
 
@@ -248,11 +260,15 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
         <button id="tab-profile" role="tab" data-tab="profile"></button>
       </div>
       <div id="filters" class="head" style="padding:0;border:0">
-        <div class="lbl" id="t-which"></div>
-        <div class="species" id="species"></div>
-        <div class="chips" id="types"></div>
-        <div class="chips" id="dates"></div>
-        <div class="search"><input id="q" type="search" autocomplete="off"></div>
+        <div class="search"><input id="q" type="search" autocomplete="off"><button class="fbtn" id="ftoggle" aria-expanded="false" aria-controls="fpanel"></button></div>
+        <div class="fpanel" id="fpanel" hidden>
+          <div class="lbl" id="t-which"></div>
+          <div class="species" id="species"></div>
+          <div class="chips" id="types"></div>
+          <div class="chips" id="dates"></div>
+          <div class="factions"><button class="btn" id="freset"></button><button class="btn primary" id="fdone"></button></div>
+          <div class="count" id="t-sample"></div>
+        </div>
         <div class="count" id="count"></div>
       </div>
     </div>
@@ -297,6 +313,7 @@ const G = {
   camera: svg('<path d="M9 4h6l1.5 2H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.5L9 4zm3 4.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9z"/>'),
   plus: svg('<path d="M10.5 3h3v7.5H21v3h-7.5V21h-3v-7.5H3v-3h7.5z"/>'),
   loc: svg('<path d="M12 2a7 7 0 0 1 7 7c0 5.2-7 13-7 13S5 14.2 5 9a7 7 0 0 1 7-7zm0 4.3a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4z"/>'),
+  filter: svg('<path d="M3 5h18l-7 8.2V19l-4 2v-7.8z"/>'),
   medal: svg('<path d="M7 2h4l1 4 1-4h4l-3 7a6 6 0 1 1-4 0L7 2zm5 9a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>')
 };
 const SPECIES = ['all', 'dog', 'cat', 'bird', 'rodent', 'reptile', 'fish', 'other'];
@@ -497,6 +514,9 @@ Object.assign(T.en, { whereL: 'Where?', wherePh: 'Type a street, district or par
   geoFail: 'Could not get your location. This preview blocks GPS — it will work in the app. Type an address or pick the point on the map.',
   outside: 'You are outside Wrocław — check the point on the map.', kinds: { s: 'street', p: 'district', o: 'place' }, pointSet: (n) => `Point set: ${n}`,
   pickAdjust: 'Check the point: tap the map or drag the pin to adjust.', publishHere: 'Publish here', myLoc: 'My location', next2: 'Next: check on the map' });
+Object.assign(T.pl, { filters: 'Filtry', freset: 'Wyczyść', show: (n) => `Pokaż (${n})` });
+Object.assign(T.ru, { filters: 'Фильтры', freset: 'Сбросить', show: (n) => `Показать (${n})` });
+Object.assign(T.en, { filters: 'Filters', freset: 'Reset', show: (n) => `Show (${n})` });
 // ---------- Example data (not real people or events). `min` = minutes ago ----------
 const L3 = (pl, ru, en) => ({ pl, ru, en });
 const ITEMS = [
@@ -686,7 +706,7 @@ function queryMatch(it) {
   return query.toLowerCase().split(/\s+/).every((w) => hay.includes(w));
 }
 const baseVisible = (it) => live(it) && speciesMatch(it) && periodMatch(it) && queryMatch(it);
-let galF = 'all';
+let galF = 'all', fOpen = false;
 const inGallery = (i) => (i.type === 'found' || i.type === 'seen') && (galF === 'all' || i.type === galF);
 const visible = () => ITEMS.filter((i) => (tab === 'gallery' ? inGallery(i) : on[i.type]) && baseVisible(i));
 
@@ -806,6 +826,10 @@ function renderChrome() {
   $('filters').hidden = tab !== 'feed' && tab !== 'gallery';
   $('loading').textContent = t.loading;
   $('t-which').textContent = t.which;
+  const nAct = (species !== 'all') + (period !== 'all') + (tab === 'gallery' ? galF !== 'all' : Object.values(on).some((v) => !v));
+  $('ftoggle').innerHTML = `${G.filter}${t.filters}${nAct ? `<b>${nAct}</b>` : ''}`;
+  $('ftoggle').setAttribute('aria-expanded', String(fOpen)); $('fpanel').hidden = !fOpen;
+  $('freset').textContent = t.freset; $('fdone').textContent = t.show(visible().length); $('t-sample').textContent = t.sample;
   $('species').innerHTML = SPECIES.map((s) => `<button class="sp" id="sp-${s}" data-sp="${s}" aria-pressed="${species === s}">${spGlyph(s)}${t.sp[s]}</button>`).join('');
   if (tab === 'gallery') $('types').innerHTML = ['all', 'found', 'seen'].map((k) => {
     const n = ITEMS.filter((i) => baseVisible(i) && (i.type === 'found' || i.type === 'seen') && (k === 'all' || i.type === k)).length;
@@ -817,7 +841,8 @@ function renderChrome() {
   }).join('');
   $('dates').innerHTML = Object.keys(DATES).map((d) => `<button class="chip flat" id="dt-${d}" data-d="${d}" aria-pressed="${period === d}">${t.dates[d]}</button>`).join('');
   $('q').placeholder = t.q;
-  $('count').textContent = t.count(visible().length) + ' · ' + t.sample;
+  $('count').textContent = [species !== 'all' ? t.sp[species] : '', period !== 'all' ? t.dates[period] : '', t.count(visible().length)].filter(Boolean).join(' · ');
+  $('count').hidden = fOpen;
   $('fab-add').innerHTML = G.plus + t.addFab;
   $('fab-seen').innerHTML = G.eye + t.seenFab;
   $('fab-loc').innerHTML = G.loc; $('fab-loc').title = t.myLoc; $('fab-loc').setAttribute('aria-label', t.myLoc);
@@ -1137,6 +1162,9 @@ document.addEventListener('click', async (e) => {
   if (b.dataset.l) { lang = b.dataset.l; save(); renderAll(); if (!$('modal').hidden && draft) { readForm(); draft.sightFor ? openSighting(ITEMS.find((i) => i.id === draft.sightFor)) : openForm(); } }
   else if (b.dataset.tab) { tab = b.dataset.tab; if (selected && !visible().some((i) => i.id === selected)) selected = null; renderAll(); }
   else if (b.dataset.gf) { galF = b.dataset.gf; renderAll(); }
+  else if (b.id === 'ftoggle') { fOpen = !fOpen; renderChrome(); }
+  else if (b.id === 'fdone') { fOpen = false; renderChrome(); }
+  else if (b.id === 'freset') { species = 'all'; period = 'all'; galF = 'all'; Object.keys(on).forEach((k) => { on[k] = true; }); renderAll(); }
   else if (b.dataset.sp) { species = b.dataset.sp; if (selected && !visible().some((i) => i.id === selected)) selected = null; renderAll(); }
   else if (b.dataset.k) { on[b.dataset.k] = !on[b.dataset.k]; renderChrome(); renderList(); drawMap(); }
   else if (b.dataset.d) { period = b.dataset.d; renderAll(); }
