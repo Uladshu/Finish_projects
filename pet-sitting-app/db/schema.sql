@@ -7,7 +7,8 @@ create extension if not exists btree_gist;   -- gist-индексы по (uuid, 
 
 -- ---------- Справочники ----------
 
-create type pet_species     as enum ('dog', 'cat', 'other');
+create type pet_species     as enum ('dog', 'cat', 'rabbit', 'rodent', 'ferret', 'bird',
+                                     'reptile', 'amphibian', 'fish', 'other');
 create type pet_size        as enum ('xs', 's', 'm', 'l', 'xl');           -- до 3 / 3–10 / 10–25 / 25–45 / 45+ кг
 create type service_type    as enum ('boarding', 'house_sitting', 'drop_in', 'walking', 'day_care');
 create type price_unit      as enum ('night', 'day', 'visit', 'walk');
@@ -112,7 +113,7 @@ create index availability_blocks_period_idx on availability_blocks using gist (s
 create table bookings (
   id            uuid primary key default gen_random_uuid(),
   owner_id      uuid not null references profiles(id),
-  sitter_id     uuid not null references sitter_profiles(user_id),
+  sitter_id     uuid not null references profiles(id),          -- любой пользователь: ситтер, сосед, «друг животных»
   service       service_type not null,
   period        tstzrange not null,
   status        booking_status not null default 'requested',
