@@ -97,6 +97,20 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .fab { display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 999px; padding: 13px 18px; color: #fff; font-weight: 700; font-size: 15px; box-shadow: var(--shadow); cursor: pointer; }
 .fab svg { width: 18px; height: 18px; fill: currentColor; }
 .hint { position: absolute; z-index: 6; left: 50%; top: calc(14px + env(safe-area-inset-top, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--panel); padding: 10px 14px 10px 16px; border-radius: 999px; font-weight: 600; font-size: 14px; box-shadow: var(--shadow); max-width: calc(100% - 32px); display: flex; gap: 10px; align-items: center; }
+.where { position: relative; display: grid; gap: 6px; }
+.where input { width: 100%; }
+.sugg { position: absolute; z-index: 5; left: 0; right: 0; top: 100%; margin-top: 2px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+.sugg button { display: flex; justify-content: space-between; gap: 10px; width: 100%; border: 0; background: transparent; padding: 8px 11px; text-align: left; cursor: pointer; font-size: 14px; color: var(--ink); }
+.sugg button:hover, .sugg button:focus-visible { background: var(--chip); }
+.sugg small { color: var(--muted); font-size: 12px; flex: none; }
+.wbtns { display: flex; flex-wrap: wrap; gap: 6px; }
+.wbtns .btn { padding: 7px 11px; font-size: 13px; display: inline-flex; gap: 6px; align-items: center; }
+.wbtns svg { width: 16px; height: 16px; fill: currentColor; }
+.pointok { font-size: 12px; color: var(--found); font-weight: 600; font-style: normal; }
+.pickpin { width: 40px; height: 40px; border-radius: 50% 50% 50% 4px; transform: rotate(-45deg); background: var(--accent); border: 3px solid #fff; box-shadow: 0 4px 14px rgba(0,0,0,.35); cursor: grab; display: grid; place-items: center; }
+.pickpin::after { content: ""; width: 12px; height: 12px; border-radius: 50%; background: #fff; }
+.medot { width: 16px; height: 16px; border-radius: 50%; background: #2f7cf6; border: 3px solid #fff; box-shadow: 0 0 0 6px rgba(47,124,246,.25); }
+.fab.small { padding: 11px; } .fab.small svg { width: 20px; height: 20px; }
 .hint button { border: 0; background: color-mix(in srgb, var(--panel) 20%, transparent); color: var(--panel); border-radius: 999px; padding: 4px 10px; cursor: pointer; font-weight: 600; }
 .maplibregl-ctrl-attrib { font-size: 11px; }
 
@@ -250,6 +264,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     <div class="hint" id="hint" hidden></div>
     <div class="sheet" id="sheet" hidden></div>
     <div class="fabs">
+      <button class="fab small" id="fab-loc" style="background:var(--panel);color:var(--ink)"></button>
       <button class="fab" id="fab-seen" style="background:var(--seen)"></button>
       <button class="fab" id="fab-add" style="background:var(--lost)"></button>
     </div>
@@ -281,6 +296,7 @@ const G = {
   tree: svg('<path d="M12 2 5 12h4l-4 6h6v4h2v-4h6l-4-6h4z"/>'),
   camera: svg('<path d="M9 4h6l1.5 2H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.5L9 4zm3 4.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9z"/>'),
   plus: svg('<path d="M10.5 3h3v7.5H21v3h-7.5V21h-3v-7.5H3v-3h7.5z"/>'),
+  loc: svg('<path d="M12 2a7 7 0 0 1 7 7c0 5.2-7 13-7 13S5 14.2 5 9a7 7 0 0 1 7-7zm0 4.3a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4z"/>'),
   medal: svg('<path d="M7 2h4l1 4 1-4h4l-3 7a6 6 0 1 1-4 0L7 2zm5 9a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>')
 };
 const SPECIES = ['all', 'dog', 'cat', 'bird', 'rodent', 'reptile', 'fish', 'other'];
@@ -469,6 +485,18 @@ Object.assign(T.ru, { gallery: 'Галерея', galNote: 'Найденные и
   comment: 'Комментарий', commentPh: 'Внешность, ошейник, поведение, где сейчас, как связаться…', where: 'Где' });
 Object.assign(T.en, { gallery: 'Gallery', galNote: 'Found and spotted animals. Looking for yours? Browse the photos — tap one to see the place on the map.', galAll: 'All', galEmpty: 'No found or spotted animals for these filters.',
   comment: 'Comment', commentPh: 'Looks, collar, behaviour, where it is now, how to reach you…', where: 'Where' });
+Object.assign(T.pl, { whereL: 'Gdzie?', wherePh: 'Wpisz ulicę, osiedle lub park', locate: 'Zlokalizuj mnie', onMap: 'Wskaż na mapie', locating: 'Szukam Twojej lokalizacji…',
+  geoFail: 'Nie udało się ustalić lokalizacji. W tym podglądzie przeglądarka blokuje GPS — w aplikacji zadziała. Wpisz adres albo wskaż punkt na mapie.',
+  outside: 'Jesteś poza Wrocławiem — sprawdź punkt na mapie.', kinds: { s: 'ulica', p: 'osiedle', o: 'miejsce' }, pointSet: (n) => `Punkt ustawiony: ${n}`,
+  pickAdjust: 'Sprawdź punkt: kliknij mapę lub przeciągnij pinezkę, żeby poprawić.', publishHere: 'Opublikuj tutaj', myLoc: 'Moja lokalizacja', next2: 'Dalej: sprawdź na mapie' });
+Object.assign(T.ru, { whereL: 'Где?', wherePh: 'Введите улицу, район или парк', locate: 'Определить меня', onMap: 'Указать на карте', locating: 'Определяю ваше местоположение…',
+  geoFail: 'Не удалось определить местоположение. В этом предпросмотре браузер блокирует GPS — в приложении будет работать. Введите адрес или укажите точку на карте.',
+  outside: 'Вы за пределами Вроцлава — проверьте точку на карте.', kinds: { s: 'улица', p: 'район', o: 'место' }, pointSet: (n) => `Точка установлена: ${n}`,
+  pickAdjust: 'Проверьте точку: нажмите на карту или перетащите метку, чтобы поправить.', publishHere: 'Опубликовать здесь', myLoc: 'Моё местоположение', next2: 'Дальше: проверить на карте' });
+Object.assign(T.en, { whereL: 'Where?', wherePh: 'Type a street, district or park', locate: 'Locate me', onMap: 'Pick on the map', locating: 'Finding your location…',
+  geoFail: 'Could not get your location. This preview blocks GPS — it will work in the app. Type an address or pick the point on the map.',
+  outside: 'You are outside Wrocław — check the point on the map.', kinds: { s: 'street', p: 'district', o: 'place' }, pointSet: (n) => `Point set: ${n}`,
+  pickAdjust: 'Check the point: tap the map or drag the pin to adjust.', publishHere: 'Publish here', myLoc: 'My location', next2: 'Next: check on the map' });
 // ---------- Example data (not real people or events). `min` = minutes ago ----------
 const L3 = (pl, ru, en) => ({ pl, ru, en });
 const ITEMS = [
@@ -792,6 +820,7 @@ function renderChrome() {
   $('count').textContent = t.count(visible().length) + ' · ' + t.sample;
   $('fab-add').innerHTML = G.plus + t.addFab;
   $('fab-seen').innerHTML = G.eye + t.seenFab;
+  $('fab-loc').innerHTML = G.loc; $('fab-loc').title = t.myLoc; $('fab-loc').setAttribute('aria-label', t.myLoc);
 }
 function fur(it) {
   const s = ['pl', 'ru', 'en'].map((l) => [it.color, it.breed, it.desc].map((o) => o && typeof o === 'object' ? o[l] : o || '').join(' ')).join(' ').toLowerCase();
@@ -960,7 +989,7 @@ function select(id, fly) {
 function renderAll() { renderChrome(); renderList(); renderSheet(); drawMap(); }
 
 function toast(msg) { const el = $('toast'); el.textContent = msg; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { el.hidden = true; }, 4200); }
-function setHint(msg) { $('hint').innerHTML = msg ? `${esc(msg)} <button data-act="stop">${T[lang].stop}</button>` : ''; $('hint').hidden = !msg; }
+function setHint(msg) { $('hint').innerHTML = msg ? `${esc(msg)} ${pick && draft && draft.point ? `<button data-act="publish" style="background:var(--accent);color:var(--accent-ink)">${T[lang].publishHere}</button>` : ''}<button data-act="stop">${T[lang].stop}</button>` : ''; $('hint').hidden = !msg; }
 
 // ---------- Photos ----------
 function compress(file) {
@@ -1020,7 +1049,7 @@ function openForm() {
     fields += inp('nf-title', f.title + ' *', draft.title, '', true);
   }
   fields += `<label class="f">${f.when[ty]} *<input id="nf-when" type="datetime-local" value="${esc(draft.whenAt || nowLocal())}" max="${nowLocal()}"></label>`;
-  fields += inp('nf-street', f.street, draft.street);
+  fields += whereField();
   fields += short ? `<label class="f full">${t.comment}<textarea id="nf-desc" placeholder="${t.commentPh}">${esc(draft.desc)}</textarea></label>` : area('nf-desc', f.desc, draft.desc);
   if (ty === 'lost') fields += area('nf-behavior', f.behavior, draft.behavior) + inp('nf-reward', f.reward, draft.reward);
   fields += photoField();
@@ -1028,7 +1057,7 @@ function openForm() {
     <div><div class="lbl" style="margin-bottom:6px">${t.what}</div><div class="types">${['lost', 'found', 'seen', 'help', 'give', 'hazard'].map((k) =>
       `<button id="nt-${k}" data-nt="${k}" aria-pressed="${ty === k}" style="--c:${TYPES[k].c}">${k === 'lost' || k === 'found' ? spGlyph(draft.species) : k === 'seen' ? G.eye : G[TYPES[k].g]}${t.newT[k]}</button>`).join('')}</div></div>
     <div class="grid2">${fields}</div>
-    <div class="actions" style="justify-content:flex-end"><button class="btn" id="nf-cancel">${t.cancel}</button><button class="btn primary" id="nf-next">${t.next}</button></div>`;
+    <div class="actions" style="justify-content:flex-end"><button class="btn" id="nf-cancel">${t.cancel}</button><button class="btn primary" id="nf-next">${draft.point ? t.next2 : t.next}</button></div>`;
   $('modal').hidden = false;
 }
 function startReport(type) {
@@ -1048,19 +1077,43 @@ function openSighting(it) {
   if (!draft || draft.sightFor !== it.id) draft = { sightFor: it.id, photos: [] };
   $('modal-body').innerHTML = `<h2>${t.sightTitle}</h2><p class="count" style="margin:-4px 0 0">${esc(titleOf(it))}</p><div class="grid2">
     <label class="f">${t.f.when.seen} *<input id="nf-when" type="datetime-local" value="${esc(draft.whenAt || nowLocal())}" max="${nowLocal()}"></label>
-    <label class="f">${t.f.street}<input id="nf-street" value="${esc(draft.street)}"></label>
+    ${whereField()}
     <label class="f full">${t.sightNote}<textarea id="nf-desc">${esc(draft.desc)}</textarea></label>${photoField()}</div>
-    <div class="actions" style="justify-content:flex-end"><button class="btn" id="nf-cancel">${t.cancel}</button><button class="btn primary" id="nf-next">${t.next}</button></div>`;
+    <div class="actions" style="justify-content:flex-end"><button class="btn" id="nf-cancel">${t.cancel}</button><button class="btn primary" id="nf-next">${draft.point ? t.next2 : t.next}</button></div>`;
   $('modal').hidden = false;
 }
+let pickPin = null;
+function setPickPoint(ll, fly) {
+  draft.point = { lat: ll.lat, lng: ll.lng };
+  if (!pickPin) {
+    const el = document.createElement('div'); el.className = 'pickpin';
+    pickPin = new maplibregl.Marker({ element: el, draggable: true, anchor: 'bottom-left', offset: [-2, 2] });
+    pickPin.on('dragend', () => { const p = pickPin.getLngLat(); draft.point = { lat: p.lat, lng: p.lng }; autoStreet(); });
+  }
+  pickPin.setLngLat([ll.lng, ll.lat]).addTo(map);
+  if (fly) map.flyTo({ center: [ll.lng, ll.lat], zoom: Math.max(map.getZoom(), 16), duration: 600 });
+  setHint(T[lang].pickAdjust);
+}
+async function autoStreet() { if (draft && (!draft.street || draft.streetAuto)) { const n = await nearestStreet(draft.point.lat, draft.point.lng); if (n && draft) { draft.street = n; draft.streetAuto = true; } } }
+function startPick() {
+  const t = T[lang];
+  $('modal').hidden = true; pick = draft.sightFor ? 'sight' : 'new';
+  if (draft.point) setPickPoint(draft.point, true);
+  else setHint(pick === 'sight' || draft.type === 'seen' ? t.pickSeen : t.pick);
+}
+function endPick() { pick = null; if (pickPin) pickPin.remove(); setHint(''); }
 function onMapPick(ll) {
+  if (!pick || !draft) return;
+  setPickPoint(ll, false); autoStreet();
+}
+function finalizePick(ll) {
   if (!pick || !draft) return;
   const t = T[lang], at = draft.whenAt ? new Date(draft.whenAt).getTime() : clock();
   if (pick === 'sight') {
     const it = ITEMS.find((i) => i.id === draft.sightFor);
     it.sightings = it.sightings || [];
     it.sightings.push({ lat: ll.lat, lng: ll.lng, at, note: draft.desc || draft.street || '', photos: draft.photos, mine: true });
-    pick = null; draft = null; setHint(''); save(); renderAll(); toast(t.seenAdded + ' ' + award('seen'));
+    endPick(); draft = null; save(); renderAll(); toast(t.seenAdded + ' ' + award('seen'));
     return;
   }
   const L = (s) => s || undefined;
@@ -1068,7 +1121,7 @@ function onMapPick(ll) {
     size: L(draft.size), color: L(draft.color), collar: L(draft.collar), chip: L(draft.chip), street: L(draft.street), desc: draft.desc || '', behavior: L(draft.behavior),
     reward: L(draft.reward), now: L(draft.now), title: L(draft.title), price: L(draft.price), hz: L(draft.hz), photos: draft.photos || [],
     lat: ll.lat, lng: ll.lng, at, confirmedAt: clock(), sightings: [], confirms: 0 };
-  ITEMS.push(it); on[it.type] = true; pick = null; draft = null; setHint('');
+  ITEMS.push(it); on[it.type] = true; endPick(); draft = null;
   if (species !== 'all' && it.species && species !== it.species && ANIMAL(it.type)) species = it.species;
   save();
   const r = it.type === 'lost' ? searchRadius(it) : 1500;
@@ -1097,16 +1150,35 @@ document.addEventListener('click', async (e) => {
   else if (b.dataset.nt) { readForm(); draft.type = b.dataset.nt; openForm(); }
   else if (b.dataset.rmph) { readForm(); draft.photos.splice(Number(b.dataset.rmph), 1); draft.sightFor ? reopenSighting() : openForm(); }
   else if (b.id === 'nf-cancel') { draft = null; $('modal').hidden = true; }
+  else if (b.dataset.sug != null) {
+    const s = (await suggest($('nf-street').value))[Number(b.dataset.sug)]; if (!s) return;
+    readForm(); draft.street = s.n; draft.streetAuto = false; draft.point = { lat: s.lat, lng: s.lng };
+    draft.sightFor ? reopenSighting() : openForm();
+  }
+  else if (b.id === 'nf-locate') {
+    readForm(); toast(t.locating);
+    try {
+      const p = await locate(); draft.point = p; draft.streetAuto = true; draft.street = await nearestStreet(p.lat, p.lng) || draft.street;
+      if (!inCity(p)) toast(t.outside); else $('toast').hidden = true;
+      draft.sightFor ? reopenSighting() : openForm();
+    } catch (err) { toast(t.geoFail); }
+  }
+  else if (b.id === 'fab-loc') {
+    toast(t.locating);
+    try { const p = await locate(); showMe(p); map.flyTo({ center: [p.lng, p.lat], zoom: 15.5 }); $('toast').hidden = true; if (!inCity(p)) toast(t.outside); }
+    catch (err) { toast(t.geoFail); }
+  }
   else if (b.id === 'nf-next') {
     readForm();
     if (!draft.sightFor && !validate()) { toast(t.need); return; }
-    $('modal').hidden = true; pick = draft.sightFor ? 'sight' : 'new'; setHint(pick === 'sight' || draft.type === 'seen' ? t.pickSeen : t.pick);
+    startPick();
   }
   else if (b.dataset.photo != null) { const it = ITEMS.find((i) => i.id === selected); openLightbox(it.photos, Number(b.dataset.photo)); }
   else if (b.dataset.act) {
     const it = ITEMS.find((i) => i.id === selected);
     const act = b.dataset.act;
-    if (act === 'stop') { pick = null; draft = null; setHint(''); }
+    if (act === 'stop') { endPick(); draft = null; }
+    else if (act === 'publish') finalizePick(draft.point);
     else if (act === 'close') { selected = null; renderSheet(); renderList(); drawMap(); }
     else if (act === 'sight') { draft = null; openSighting(it); }
     else if (act === 'poster') openPoster(it);
@@ -1125,6 +1197,39 @@ function lifeAction(act, it) {
   else if (act === 'still') { it.confirmedAt = clock(); toast(t.confirmedToast(fmtDate(it.confirmedAt + POLL_EVERY))); }
   else if (act === 'resolved') { it.closed = true; if (selected === it.id) selected = null; toast(t.closedToast); }
   save(); renderAll();
+}
+// ---------- Location: offline Wrocław street index (built from the map data) + browser geolocation ----------
+let STREETS = null;
+const norm = (x) => x.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l').replace(/\b(ul|ulica|al|aleja|pl|plac|os|osiedle)\b\.?/g, ' ').replace(/[^a-z0-9а-я ]+/g, ' ').replace(/\s+/g, ' ').trim();
+function loadStreets() { return STREETS ||= fetch('streets.json').then((r) => r.json()).then((a) => a.map(([n, lat, lng, k]) => ({ n, lat, lng, k, q: norm(n) }))).catch(() => []); }
+async function suggest(text) {
+  const q = norm(text); if (q.length < 2) return [];
+  const words = q.split(' ');
+  return (await loadStreets()).filter((s) => words.every((w) => s.q.includes(w)))
+    .sort((a, b) => (b.q.startsWith(q) || b.q.split(' ').some((w) => w.startsWith(words[0]))) - (a.q.startsWith(q) || a.q.split(' ').some((w) => w.startsWith(words[0]))) || a.n.length - b.n.length).slice(0, 8);
+}
+async function nearestStreet(lat, lng) {
+  let best = null, bd = Infinity;
+  (await loadStreets()).forEach((s) => { if (s.k !== 's') return; const d = dist({ lat, lng }, s); if (d < bd) { bd = d; best = s; } });
+  return best && bd < 600 ? best.n : '';
+}
+function whereField() {
+  const t = T[lang];
+  return `<div class="f full">${t.whereL}<div class="where"><input id="nf-street" autocomplete="off" placeholder="${t.wherePh}" value="${esc(draft.street)}"><div class="sugg" id="sugg" hidden></div></div>
+    <div class="wbtns"><button class="btn" type="button" id="nf-locate">${G.loc}${t.locate}</button>${draft.point ? `<span class="pointok">✓ ${esc(t.pointSet(draft.street || `${draft.point.lat.toFixed(4)}, ${draft.point.lng.toFixed(4)}`))}</span>` : ''}</div></div>`;
+}
+function locate() {
+  return new Promise((res, rej) => {
+    if (!navigator.geolocation) return rej(new Error('no geolocation'));
+    navigator.geolocation.getCurrentPosition((p) => res({ lat: p.coords.latitude, lng: p.coords.longitude }), rej, { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 });
+  });
+}
+const inCity = (p) => p.lng >= CITY[0] && p.lng <= CITY[2] && p.lat >= CITY[1] && p.lat <= CITY[3];
+let meMarker = null;
+function showMe(p) {
+  if (!map) return;
+  if (!meMarker) { const d = document.createElement('div'); d.className = 'medot'; meMarker = new maplibregl.Marker({ element: d }); }
+  meMarker.setLngLat([p.lng, p.lat]).addTo(map);
 }
 const reopenSighting = () => openSighting(ITEMS.find((i) => i.id === draft.sightFor));
 function openPoster(it) {
@@ -1148,9 +1253,16 @@ document.addEventListener('change', async (e) => {
     draft.sightFor ? reopenSighting() : openForm();
   } else if (e.target.id === 'nf-species' && draft) { readForm(); openForm(); }
 });
+document.addEventListener('input', async (e) => {
+  if (e.target.id !== 'nf-street') return;
+  if (draft) { draft.street = e.target.value; draft.streetAuto = false; }
+  const list = await suggest(e.target.value), box = $('sugg'); if (!box) return;
+  box.innerHTML = list.map((s, i) => `<button type="button" data-sug="${i}">${esc(s.n)}<small>${T[lang].kinds[s.k]}</small></button>`).join('');
+  box.hidden = !list.length;
+});
 $('q').addEventListener('input', (e) => { query = e.target.value.trim(); renderChrome(); renderList(); drawMap(); });
 $('modal').addEventListener('click', (e) => { if (e.target === $('modal')) { $('modal').hidden = true; draft = null; } });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { $('modal').hidden = true; $('lightbox').hidden = true; if (pick) { pick = null; draft = null; setHint(''); } } });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { $('modal').hidden = true; $('lightbox').hidden = true; if (pick) { endPick(); draft = null; } } });
 
 renderChrome(); renderList();
 initMap();
