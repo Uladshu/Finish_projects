@@ -13,5 +13,6 @@
 ## Чего ещё нет (нужно для соцсети-первой версии)
 - Группы и участники, посты ленты (вопрос / помощь / отдам / фото), комментарии, реакции.
 - Генерация плакатов о потере (PDF + QR).
+- Жизненный цикл: у объявлений `confirmed_at`, `poll_sent_at`, `status` (active/asked/expired/closed) + задача раз в час (pg_cron); таблица `found_claims(post_id, finder_id, note, status)` — закрытие только владельцем.
 - Медали `achievements(user_id, medal, earned_at)`; расширить `help_points_ledger.reason` (см. features/gamification.md).
 - Журналы ухода (аквариум: параметры воды; рептилии: кормление, линька).

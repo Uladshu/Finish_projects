@@ -117,6 +117,11 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .note { font-size: 13px; color: var(--ink); line-height: 1.45; background: var(--chip); padding: 10px 12px; border-radius: 10px; }
 .note.warn { background: color-mix(in srgb, var(--hazard) 16%, var(--panel)); }
+.note.ok { background: color-mix(in srgb, var(--found) 14%, var(--panel)); }
+.badge.warnb { background: color-mix(in srgb, var(--hazard) 22%, var(--panel)); }
+.badge.okb { background: color-mix(in srgb, var(--found) 20%, var(--panel)); }
+.mypost { display: grid; gap: 6px; padding: 10px; border: 1px solid var(--line); border-radius: 12px; }
+.mypost b { font-size: 14px; } .mypost span { font-size: 12px; color: var(--muted); }
 .subh { font-weight: 700; font-size: 13px; margin-bottom: -4px; }
 .sl { display: grid; gap: 8px; }
 .sl .row { display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: center; font-size: 13px; border: 0; background: var(--chip); border-radius: 10px; padding: 6px; text-align: left; cursor: pointer; }
@@ -402,10 +407,52 @@ const T = {
 Object.assign(T.pl, { btnPoster: 'Plakat z QR', posterTitle: 'Plakat do druku', posterContact: 'Widziałeś? Zeskanuj kod i zaznacz miejsce na mapie.', posterNote: 'W aplikacji plakat pobierzesz jako PDF. Kod QR prowadzi do strony zgłoszenia, gdzie sąsiedzi zaznaczają, gdzie widzieli zwierzę.' });
 Object.assign(T.ru, { btnPoster: 'Плакат с QR', posterTitle: 'Плакат для печати', posterContact: 'Widziałeś? Zeskanuj kod i zaznacz miejsce na mapie.', posterNote: 'Плакат печатается на польском. В приложении он скачивается в PDF; QR-код ведёт на страницу объявления, где соседи отмечают, где видели животное.' });
 Object.assign(T.en, { btnPoster: 'QR poster', posterTitle: 'Printable poster', posterContact: 'Widziałeś? Zeskanuj kod i zaznacz miejsce na mapie.', posterNote: 'The poster is printed in Polish. In the app it downloads as a PDF; the QR code opens the report page where neighbours mark where they saw the pet.' });
+Object.assign(T.pl, { claimBtn: 'Znalazłem — jest u mnie', you: 'Ty', ownerConfirm: 'Potwierdzam — wróciło do domu', ownerReject: 'To nie moje zwierzę', demoOwner: 'Demo: właściciel potwierdza',
+  claimPending: (who, ago) => `${who} zgłasza, że zwierzę jest u niego (${ago}). Ogłoszenie może zamknąć tylko właściciel, po potwierdzeniu.`,
+  claimMine: 'Zgłosiłeś, że zwierzę jest u Ciebie. Właściciel dostał powiadomienie i musi to potwierdzić.',
+  claimOwner: (who, ago, note) => `${who} pisze, że Twoje zwierzę jest u niego (${ago})${note ? ': „' + note + '”' : ''}. Sprawdź i potwierdź — dopiero wtedy ogłoszenie zniknie.`,
+  claimSent: 'Wysłano. Właściciel musi potwierdzić, zanim ogłoszenie zniknie.', closedBy: (who) => `Ogłoszenie zamknięte. ${who} dostaje +100 łapek za pomoc.`, rejected: 'Zgłoszenie odrzucone. Ogłoszenie nadal jest aktywne.',
+  claimBadge: 'Zgłoszono znalezienie', refreshed: 'Aktualne na', askedBadge: (l) => `Czeka na autora · zniknie za ${l}`,
+  lifeNote: (d) => `Co 3 dni pytamy autora, czy ogłoszenie jest aktualne. Następne pytanie: ${d}. Bez odpowiedzi w ciągu 2 dni ogłoszenie znika.`,
+  askedNote: (d) => `Autor dostał pytanie, czy ogłoszenie jest nadal aktualne. Jeśli nie odpowie, zniknie ${d}.`,
+  ownAsked: (d) => `Czy to ogłoszenie jest nadal aktualne? Odpowiedz do ${d}, inaczej zniknie.`,
+  stillActive: 'Nadal aktualne', resolved: 'Znalezione / nieaktualne', republish: 'Opublikuj ponownie',
+  myPosts: 'Moje ogłoszenia', stActive: (d) => `Aktywne · następne pytanie ${d}`, stAsked: (d) => `Pytamy: nadal aktualne? Odpowiedz do ${d}`, stExpired: 'Wygasło — brak odpowiedzi', stClosed: 'Zamknięte',
+  pollToast: (title) => `Pytanie od Łapki: czy „${title}” jest nadal aktualne? Odpowiedz w profilu.`, confirmedToast: (d) => `Dziękujemy! Data odświeżona, kolejne pytanie ${d}.`, closedToast: 'Ogłoszenie zamknięte. Dziękujemy!',
+  demoTime: 'Demo: przewiń czas, żeby zobaczyć pytania i wygasanie', plusDay: '+1 dzień', resetTime: 'Teraz', simNow: (d) => `Czas w prototypie: ${d}`,
+  left: (m) => m < 60 ? `${Math.max(1, Math.round(m))} min` : m < 1440 ? `${Math.round(m / 60)} godz.` : `${Math.round(m / 1440)} dni` });
+Object.assign(T.ru, { claimBtn: 'Я нашёл — он у меня', you: 'Вы', ownerConfirm: 'Подтверждаю — вернулся домой', ownerReject: 'Это не моё животное', demoOwner: 'Демо: хозяин подтверждает',
+  claimPending: (who, ago) => `${who} сообщает, что животное у него (${ago}). Снять объявление может только хозяин после подтверждения.`,
+  claimMine: 'Вы сообщили, что животное у вас. Хозяин получил уведомление и должен это подтвердить.',
+  claimOwner: (who, ago, note) => `${who} пишет, что ваше животное у него (${ago})${note ? ': «' + note + '»' : ''}. Проверьте и подтвердите — только тогда объявление исчезнет.`,
+  claimSent: 'Отправлено. Хозяин должен подтвердить, прежде чем объявление исчезнет.', closedBy: (who) => `Объявление закрыто. ${who} получает +100 лапок за помощь.`, rejected: 'Заявка отклонена. Объявление остаётся активным.',
+  claimBadge: 'Сообщили о находке', refreshed: 'Актуально на', askedBadge: (l) => `Ждём автора · исчезнет через ${l}`,
+  lifeNote: (d) => `Каждые 3 дня мы спрашиваем автора, актуально ли объявление. Следующий вопрос: ${d}. Без ответа в течение 2 дней объявление исчезает.`,
+  askedNote: (d) => `Автор получил вопрос, актуально ли объявление. Если не ответит, оно исчезнет ${d}.`,
+  ownAsked: (d) => `Объявление ещё актуально? Ответьте до ${d}, иначе оно исчезнет.`,
+  stillActive: 'Ещё актуально', resolved: 'Нашёлся / неактуально', republish: 'Опубликовать снова',
+  myPosts: 'Мои объявления', stActive: (d) => `Активно · следующий вопрос ${d}`, stAsked: (d) => `Вопрос: ещё актуально? Ответьте до ${d}`, stExpired: 'Исчезло — не было ответа', stClosed: 'Закрыто',
+  pollToast: (title) => `Вопрос от Лапки: «${title}» ещё актуально? Ответьте в профиле.`, confirmedToast: (d) => `Спасибо! Дата обновлена, следующий вопрос ${d}.`, closedToast: 'Объявление закрыто. Спасибо!',
+  demoTime: 'Демо: перемотайте время, чтобы увидеть вопросы и исчезновение', plusDay: '+1 день', resetTime: 'Сейчас', simNow: (d) => `Время в прототипе: ${d}`,
+  left: (m) => m < 60 ? `${Math.max(1, Math.round(m))} мин` : m < 1440 ? `${Math.round(m / 60)} ч` : `${Math.round(m / 1440)} дн.` });
+Object.assign(T.en, { claimBtn: 'I found it — it’s with me', you: 'You', ownerConfirm: 'Confirm — back home', ownerReject: 'Not my pet', demoOwner: 'Demo: owner confirms',
+  claimPending: (who, ago) => `${who} says the pet is with them (${ago}). Only the owner can close the post, after confirming.`,
+  claimMine: 'You reported the pet is with you. The owner was notified and has to confirm.',
+  claimOwner: (who, ago, note) => `${who} says your pet is with them (${ago})${note ? ': “' + note + '”' : ''}. Check and confirm — only then the post disappears.`,
+  claimSent: 'Sent. The owner has to confirm before the post disappears.', closedBy: (who) => `Post closed. ${who} gets +100 paws for helping.`, rejected: 'Claim rejected. The post stays active.',
+  claimBadge: 'Found claim', refreshed: 'Current as of', askedBadge: (l) => `Waiting for author · disappears in ${l}`,
+  lifeNote: (d) => `Every 3 days we ask the author if the post is still current. Next question: ${d}. With no answer within 2 days the post disappears.`,
+  askedNote: (d) => `The author was asked if the post is still current. Without an answer it disappears ${d}.`,
+  ownAsked: (d) => `Is this post still current? Answer by ${d} or it disappears.`,
+  stillActive: 'Still current', resolved: 'Found / not current', republish: 'Publish again',
+  myPosts: 'My posts', stActive: (d) => `Active · next question ${d}`, stAsked: (d) => `Still current? Answer by ${d}`, stExpired: 'Expired — no answer', stClosed: 'Closed',
+  pollToast: (title) => `Question from Łapka: is “${title}” still current? Answer in your profile.`, confirmedToast: (d) => `Thanks! Date refreshed, next question ${d}.`, closedToast: 'Post closed. Thank you!',
+  demoTime: 'Demo: move time forward to see questions and expiry', plusDay: '+1 day', resetTime: 'Now', simNow: (d) => `Prototype time: ${d}`,
+  left: (m) => m < 60 ? `${Math.max(1, Math.round(m))} min` : m < 1440 ? `${Math.round(m / 60)} h` : `${Math.round(m / 1440)} days` });
 // ---------- Example data (not real people or events). `min` = minutes ago ----------
 const L3 = (pl, ru, en) => ({ pl, ru, en });
 const ITEMS = [
-  { id: 1, type: 'lost', species: 'dog', name: 'Bruno', breed: L3('Beagle', 'Бигль', 'Beagle'), sex: 'm', age: '4', size: 'm', chip: 'y',
+  { id: 1, type: 'lost', own: true, claim: { who: 'Marek W.', min: 15, note: L3('Jest u mnie na Zalesiu, ma czerwoną obrożę', 'Он у меня на Залесье, красный ошейник', 'He is with me in Zalesie, red collar') }, species: 'dog', name: 'Bruno', breed: L3('Beagle', 'Бигль', 'Beagle'), sex: 'm', age: '4', size: 'm', chip: 'y',
     color: L3('Trójkolorowy, biała końcówka ogona', 'Трёхцветный, белый кончик хвоста', 'Tricolour, white tail tip'),
     collar: L3('Czerwona obroża, bez adresówki', 'Красный ошейник без адресника', 'Red collar, no tag'),
     street: 'Park Szczytnicki, Pergola', lat: 51.1132, lng: 17.0812, min: 180, reward: '300 zł',
@@ -468,9 +515,9 @@ const ITEMS = [
     desc: L3('Żółw stepowy, terrarium z lampą. Szukam kogoś z doświadczeniem.', 'Среднеазиатская черепаха, террариум с лампой. Нужен опыт.', 'Russian tortoise, terrarium with lamp. Experience needed.') },
   { id: 11, type: 'give', species: 'cat', lat: 51.1212, lng: 17.0866, min: 1500, street: 'Zalesie',
     title: L3('Oddam transporter dla kota', 'Отдам переноску для кошки', 'Free cat carrier'), desc: L3('Plastikowy, średni, w dobrym stanie.', 'Пластиковая, средняя, в хорошем состоянии.', 'Plastic, medium, good condition.') },
-  { id: 12, type: 'give', species: 'fish', lat: 51.1131, lng: 17.0574, min: 3100, street: 'pl. Grunwaldzki',
+  { id: 12, type: 'give', own: true, species: 'fish', lat: 51.1131, lng: 17.0574, min: 4750, street: 'pl. Grunwaldzki',
     title: L3('Oddam młode gupiki i rośliny', 'Отдам мальков гуппи и растения', 'Free baby guppies and plants'), desc: L3('Ok. 20 młodych gupików, nurzaniec, mech jawajski.', 'Около 20 мальков гуппи, валлиснерия, яванский мох.', 'About 20 young guppies, vallisneria, java moss.') },
-  { id: 22, type: 'give', species: 'rodent', lat: 51.1098, lng: 17.0335, min: 800, street: 'Stare Miasto',
+  { id: 22, type: 'give', species: 'rodent', lat: 51.1098, lng: 17.0335, min: 6600, street: 'Stare Miasto',
     title: L3('Oddam klatkę dla chomika', 'Отдам клетку для хомяка', 'Free hamster cage'), desc: L3('Z kołowrotkiem i poidłem.', 'С колесом и поилкой.', 'With wheel and water bottle.') },
   { id: 23, type: 'give', species: 'dog', lat: 51.0712, lng: 17.0410, min: 500, street: 'Borek',
     title: L3('Oddam kojec i legowisko dla dużego psa', 'Отдам манеж и лежанку для крупной собаки', 'Free crate and bed for a large dog'), desc: L3('Kojec 106 cm, legowisko do prania.', 'Манеж 106 см, лежанка стирается.', '106 cm crate, washable bed.') },
@@ -496,7 +543,24 @@ const GROUPS = [
 let lang = 'pl', tab = 'feed', species = 'all', period = 'all', query = '', selected = null, pick = null, draft = null;
 const on = { lost: true, found: true, seen: true, help: true, give: true, hazard: true, place: true };
 const NOW = Date.now();
-ITEMS.forEach((i) => { if (i.min != null) i.at = NOW - i.min * 60000; (i.sightings || []).forEach((s) => { s.at = NOW - s.min * 60000; }); });
+// Post lifecycle: every 3 days the author is asked "still current?"; no answer within 2 days hides the post.
+// Answering "still current" refreshes the post with the confirmation date. SHIFT moves prototype time for the demo.
+const DAY = 86400000, POLL_EVERY = 3 * DAY, ANSWER_WITHIN = 2 * DAY;
+let SHIFT = 0;
+const clock = () => Date.now() + SHIFT;
+const isOwn = (it) => !!(it.mine || it.own);
+const confirmedAt = (it) => it.confirmedAt ?? it.at;
+function lifecycle(it) {
+  if (it.type === 'place' || it.at == null) return { state: 'active' };
+  if (it.closed) return { state: 'closed' };
+  const poll = confirmedAt(it) + POLL_EVERY, deadline = poll + ANSWER_WITHIN, now = clock();
+  if (now < poll) return { state: 'active', poll };
+  if (now < deadline) return { state: 'asked', deadline };
+  return { state: 'expired' };
+}
+const live = (it) => ['active', 'asked'].includes(lifecycle(it).state);
+const ownPending = (it) => isOwn(it) && (lifecycle(it).state === 'asked' || (it.type === 'lost' && it.claim && it.claim.who !== 'me' && !it.closed));
+ITEMS.forEach((i) => { if (i.min != null) i.at = NOW - i.min * 60000; (i.sightings || []).forEach((s) => { s.at = NOW - s.min * 60000; }); if (i.claim && i.claim.min != null) i.claim.at = NOW - i.claim.min * 60000; });
 let joined = new Set([0]);
 const POINTS = { seen: 10, help: 30, reunite: 100, hazard: 5, post: 5, group: 2, verify: 20 };
 const LEVELS = [0, 50, 150, 350, 700, 1500];
@@ -516,13 +580,16 @@ try {
   if (s.lang) lang = s.lang; if (s.pr) PR = s.pr; if (s.joined) joined = new Set(s.joined);
   (s.added || []).forEach((i) => ITEMS.push(i));
   (s.sights || []).forEach(([id, sg]) => { const it = ITEMS.find((x) => x.id === id); if (it) it.sightings.push(sg); });
+  (s.ov || []).forEach(([id, o]) => { const it = ITEMS.find((x) => x.id === id); if (it) Object.assign(it, o); });
+  if (s.shift) SHIFT = s.shift;
 } catch (e) {}
 PR.medals = MEDALS.filter((m) => m.ok(PR.counts)).map((m) => m.id);
 let storageWarned = false;
 function save() {
   const sights = [];
   ITEMS.forEach((i) => (i.sightings || []).forEach((sg) => { if (sg.mine) sights.push([i.id, sg]); }));
-  const data = { lang, pr: PR, joined: [...joined], added: ITEMS.filter((i) => i.mine), sights };
+  const ov = ITEMS.filter((i) => !i.mine && (i.confirmedAt || i.closed || i.claim !== undefined)).map((i) => [i.id, { confirmedAt: i.confirmedAt, closed: i.closed, claim: i.claim }]);
+  const data = { lang, pr: PR, joined: [...joined], added: ITEMS.filter((i) => i.mine), sights, ov, shift: SHIFT };
   try { localStorage.setItem('lapka-v2', JSON.stringify(data)); }
   catch (e) {
     try { // keep text, drop photos when storage is full
@@ -536,7 +603,7 @@ function save() {
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const tx = (o) => o == null ? '' : typeof o === 'string' ? o : (o[lang] || o.pl);
-const minsAgo = (at) => (Date.now() - at) / 60000;
+const minsAgo = (at) => (clock() - at) / 60000;
 const fmtDate = (at) => new Intl.DateTimeFormat(lang === 'en' ? 'en-GB' : lang, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(at);
 const when = (at) => `${fmtDate(at)} · ${T[lang].ago(minsAgo(at))}`;
 const dist = (a, b) => { const R = 6371000, toR = Math.PI / 180, dLat = (b.lat - a.lat) * toR, dLng = (b.lng - a.lng) * toR;
@@ -570,7 +637,7 @@ function queryMatch(it) {
   const hay = [titleOf(it), it.name, tx(it.breed), tx(it.color), tx(it.desc), it.street, tx(it.collar)].join(' ').toLowerCase();
   return query.toLowerCase().split(/\s+/).every((w) => hay.includes(w));
 }
-const baseVisible = (it) => speciesMatch(it) && periodMatch(it) && queryMatch(it);
+const baseVisible = (it) => live(it) && speciesMatch(it) && periodMatch(it) && queryMatch(it);
 const visible = () => ITEMS.filter((i) => on[i.type] && baseVisible(i));
 
 // ---------- Map (MapLibre + Wrocław vector tiles bundled with the page) ----------
@@ -682,6 +749,8 @@ function renderChrome() {
   document.documentElement.lang = lang;
   ['pl', 'ru', 'en'].forEach((l) => $('lang-' + l).setAttribute('aria-pressed', String(l === lang)));
   ['feed', 'groups', 'profile'].forEach((k) => { $('tab-' + k).textContent = t[k]; $('tab-' + k).setAttribute('aria-selected', String(tab === k)); });
+  const pend = ITEMS.filter(ownPending).length;
+  if (pend) $('tab-profile').textContent = `${t.profile} (${pend})`;
   const p = score(), lv = levelOf(p);
   $('lvl').innerHTML = `<b>${lv + 1}</b>${p} ${t.pts}`; $('lvl').title = t.levels[lv];
   $('filters').hidden = tab !== 'feed';
@@ -711,10 +780,14 @@ function renderList() {
     return;
   }
   const order = { lost: 0, seen: 1, found: 2, hazard: 3, help: 4, give: 5, place: 6 };
-  const rows = visible().sort((a, b) => (order[a.type] - order[b.type]) || ((b.at ?? 0) - (a.at ?? 0)));
+  const rows = visible().sort((a, b) => (order[a.type] - order[b.type]) || ((confirmedAt(b) ?? 0) - (confirmedAt(a) ?? 0)));
   $('list').innerHTML = rows.length ? rows.map((it) => {
     const meta = [];
     if (it.at) meta.push(fmtDate(it.at) + ' · ' + t.ago(minsAgo(it.at)));
+    if (it.confirmedAt && it.confirmedAt > it.at) meta.push(`${t.refreshed} ${fmtDate(it.confirmedAt)}`);
+    const lc = lifecycle(it);
+    if (lc.state === 'asked') meta.push(`<span class="badge warnb">${t.askedBadge(t.left((lc.deadline - clock()) / 60000))}</span>`);
+    if (it.type === 'lost' && it.claim) meta.push(`<span class="badge okb">${t.claimBadge}</span>`);
     if (it.street) meta.push(esc(it.street));
     if (it.type === 'lost') meta.push(`${t.f.area}: ${fmtKm(searchRadius(it))}`);
     if (it.type === 'lost' && it.sightings?.length) meta.push(`<span class="badge">${G.eye.replace('<svg', '<svg width="12" height="12" style="vertical-align:-1px;fill:currentColor"')} ${it.sightings.length}</span>`);
@@ -730,6 +803,13 @@ function renderProfile() {
   $('list').innerHTML = `<div class="prof">
     <div class="me"><div class="av">A</div><div><h3>Ania K. · ${t.levels[lv]}</h3><p>Szczytniki · ${p} ${t.pts}</p></div></div>
     <div><div class="bar"><i style="width:${pct}%"></i></div><div class="barlbl"><span>${t.lvlShort} ${lv + 1}</span><span>${next ? t.toNext(next - p, t.levels[lv + 1]) : t.maxLvl}</span></div></div>
+    <div class="lbl">${t.myPosts}</div>
+    <div class="sl">${ITEMS.filter(isOwn).map((it) => { const lc = lifecycle(it);
+      const st = lc.state === 'asked' ? t.stAsked(fmtDate(lc.deadline)) : lc.state === 'expired' ? t.stExpired : lc.state === 'closed' ? t.stClosed : t.stActive(fmtDate(lc.poll));
+      const btns = lc.state === 'asked' ? `<button class="btn primary" data-life="still" data-pid="${it.id}">${t.stillActive}</button><button class="btn" data-life="resolved" data-pid="${it.id}">${t.resolved}</button>`
+        : lc.state === 'expired' ? `<button class="btn" data-life="still" data-pid="${it.id}">${t.republish}</button>` : '';
+      return `<div class="mypost"${lc.state === 'asked' ? ' style="border-color:var(--hazard)"' : ''}><b>${esc(titleOf(it))}</b><span>${st}</span>${it.type === 'lost' && it.claim && !it.closed ? `<span style="color:var(--found);font-weight:600">${t.claimBadge}</span>` : ''}${btns || lc.state === 'active' ? `<div class="actions">${btns}${lc.state === 'active' || (it.type === 'lost' && it.claim && !it.closed) ? `<button class="btn" data-id="${it.id}">→</button>` : ''}</div>` : ''}</div>`; }).join('')}</div>
+    <div class="note">${t.demoTime}<br><b>${t.simNow(fmtDate(clock()))}</b><div class="actions" style="margin-top:8px"><button class="btn" data-time="1">${t.plusDay}</button><button class="btn" data-time="0">${t.resetTime}</button></div></div>
     <div class="lbl">${t.medalsT} · ${PR.medals.length}/${MEDALS.length}</div>
     <div class="medals">${MEDALS.map((m) => `<div class="medal${PR.medals.includes(m.id) ? '' : ' locked'}" style="--c:${m.c}"><div class="m">${G[m.g]}</div><b>${t.medals[m.id][0]}</b><span>${t.medals[m.id][1]}</span></div>`).join('')}</div>
     <div class="lbl">${t.howT}</div>
@@ -750,8 +830,8 @@ function award(act) {
 
 // ---------- Detail sheet ----------
 function matches(it) {
-  if (it.type === 'lost') return ITEMS.filter((o) => (o.type === 'seen' || o.type === 'found') && o.species === it.species && o.at >= it.at - 3600000 && dist(it, o) < Math.max(searchRadius(it) * 1.5, 1500));
-  if (it.type === 'seen' || it.type === 'found') return ITEMS.filter((o) => o.type === 'lost' && o.species === it.species && o.at <= it.at + 3600000 && dist(it, o) < Math.max(searchRadius(o) * 1.5, 1500));
+  if (it.type === 'lost') return ITEMS.filter(live).filter((o) => (o.type === 'seen' || o.type === 'found') && o.species === it.species && o.at >= it.at - 3600000 && dist(it, o) < Math.max(searchRadius(it) * 1.5, 1500));
+  if (it.type === 'seen' || it.type === 'found') return ITEMS.filter(live).filter((o) => o.type === 'lost' && o.species === it.species && o.at <= it.at + 3600000 && dist(it, o) < Math.max(searchRadius(o) * 1.5, 1500));
   return [];
 }
 function renderSheet() {
@@ -768,12 +848,13 @@ function renderSheet() {
   }
   if (it.type === 'hazard') add(f.hz, t.hzs[it.hz]);
   if (it.at) add(f.when[it.type] || f.when.give, when(it.at));
+  if (it.confirmedAt && it.confirmedAt > it.at) add(t.refreshed, fmtDate(it.confirmedAt));
   add(f.street, esc(it.street));
   if (it.type === 'lost') add(f.area, fmtKm(searchRadius(it)));
   add(f.reward, esc(it.reward));
   if (it.price) add(f.price, t.prices[it.price]);
   const acts = {
-    lost: `<button class="btn seen" data-act="sight">${G.eye.replace('<svg', '<svg width="16" height="16" style="fill:currentColor;vertical-align:-3px"')} ${t.btnSeen}</button><button class="btn" data-act="poster">${t.btnPoster}</button><button class="btn" data-act="msg">${t.btnWrite}</button><button class="btn primary" data-act="reunite">${t.btnReunite}</button>`,
+    lost: `<button class="btn seen" data-act="sight">${G.eye.replace('<svg', '<svg width="16" height="16" style="fill:currentColor;vertical-align:-3px"')} ${t.btnSeen}</button><button class="btn" data-act="poster">${t.btnPoster}</button>${isOwn(it) ? '' : `<button class="btn" data-act="msg">${t.btnWrite}</button>`}${isOwn(it) || it.claim ? '' : `<button class="btn primary" data-life="claim" data-pid="${it.id}">${t.claimBtn}</button>`}`,
     found: `<button class="btn primary" data-act="msg">${t.btnMine}</button><button class="btn" data-act="poster">${t.btnPoster}</button>`,
     seen: `<button class="btn primary" data-act="msg">${t.btnMine}</button><button class="btn" data-act="msg">${t.btnWrite}</button>`,
     help: `<button class="btn primary" data-act="help">${t.btnHelp}</button>`,
@@ -793,12 +874,29 @@ function renderSheet() {
       ${it.behavior ? `<div class="note warn"><b>${t.behaviorWarn}:</b> ${esc(tx(it.behavior))}</div>` : ''}
       ${facts.length ? `<dl class="facts">${facts.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join('')}</dl>` : ''}
       <div class="actions">${acts}</div>
+      ${claimBox(it)}${lifeBox(it)}
       ${it.type === 'lost' ? `<div class="note">${t.areaNote[it.species] || t.areaNote.other}</div>` : ''}
       ${sightRows ? `<div class="subh">${f.seenN} (${it.sightings.length})</div><div class="sl">${sightRows}</div>` : ''}
       ${m.length ? `<div class="subh">${it.type === 'lost' ? t.matchSeen : t.matchLost}</div><div class="sl">${m.map((o) => `<button class="row" data-id="${o.id}">${thumbHTML(o)}<span><b>${esc(titleOf(o))}</b><span>${fmtKm(dist(it, o))} ${t.km} · ${t.ago(minsAgo(o.at))}</span></span></button>`).join('')}</div>` : ''}
     </div>`;
   $('sheet').hidden = false;
   $('sheet').scrollTop = 0;
+}
+function claimBox(it) {
+  if (it.type !== 'lost' || !it.claim || it.closed) return '';
+  const t = T[lang], c = it.claim, who = c.who === 'me' ? t.you : c.who, ago = t.ago(minsAgo(c.at));
+  if (isOwn(it)) return `<div class="note ok">${esc(t.claimOwner(who, ago, tx(c.note)))}<div class="actions" style="margin-top:8px"><button class="btn primary" data-life="ownerConfirm" data-pid="${it.id}">${t.ownerConfirm}</button><button class="btn" data-life="ownerReject" data-pid="${it.id}">${t.ownerReject}</button></div></div>`;
+  if (c.who === 'me') return `<div class="note ok">${t.claimMine}<div class="actions" style="margin-top:8px"><button class="btn" data-life="demoOwner" data-pid="${it.id}">${t.demoOwner}</button></div></div>`;
+  return `<div class="note ok">${esc(t.claimPending(who, ago))}</div>`;
+}
+function lifeBox(it) {
+  const t = T[lang], lc = lifecycle(it);
+  if (it.type === 'place' || lc.state === 'closed') return '';
+  if (isOwn(it)) {
+    if (lc.state === 'asked') return `<div class="note warn">${t.ownAsked(fmtDate(lc.deadline))}<div class="actions" style="margin-top:8px"><button class="btn primary" data-life="still" data-pid="${it.id}">${t.stillActive}</button><button class="btn" data-life="resolved" data-pid="${it.id}">${t.resolved}</button></div></div>`;
+    return `<div class="note">${t.lifeNote(fmtDate(lc.poll))}<div class="actions" style="margin-top:8px"><button class="btn" data-life="resolved" data-pid="${it.id}">${t.resolved}</button></div></div>`;
+  }
+  return lc.state === 'asked' ? `<div class="note warn">${t.askedNote(fmtDate(lc.deadline))}</div>` : '';
 }
 function select(id, fly) {
   selected = id;
@@ -901,7 +999,7 @@ function openSighting(it) {
 }
 function onMapPick(ll) {
   if (!pick || !draft) return;
-  const t = T[lang], at = draft.whenAt ? new Date(draft.whenAt).getTime() : Date.now();
+  const t = T[lang], at = draft.whenAt ? new Date(draft.whenAt).getTime() : clock();
   if (pick === 'sight') {
     const it = ITEMS.find((i) => i.id === draft.sightFor);
     it.sightings = it.sightings || [];
@@ -913,7 +1011,7 @@ function onMapPick(ll) {
   const it = { id: Date.now(), mine: true, type: draft.type, species: draft.species, name: L(draft.name), breed: L(draft.breed), sex: L(draft.sex), age: L(draft.age),
     size: L(draft.size), color: L(draft.color), collar: L(draft.collar), chip: L(draft.chip), street: L(draft.street), desc: draft.desc || '', behavior: L(draft.behavior),
     reward: L(draft.reward), now: L(draft.now), title: L(draft.title), price: L(draft.price), hz: L(draft.hz), photos: draft.photos || [],
-    lat: ll.lat, lng: ll.lng, at, sightings: [], confirms: 0 };
+    lat: ll.lat, lng: ll.lng, at, confirmedAt: clock(), sightings: [], confirms: 0 };
   ITEMS.push(it); on[it.type] = true; pick = null; draft = null; setHint('');
   if (species !== 'all' && it.species && species !== it.species && ANIMAL(it.type)) species = it.species;
   save();
@@ -934,6 +1032,8 @@ document.addEventListener('click', async (e) => {
   else if (b.dataset.d) { period = b.dataset.d; renderAll(); }
   else if (b.dataset.id) { if (!$('modal').hidden) return; select(Number(b.dataset.id), true); }
   else if (b.id === 'lvl') { tab = 'profile'; renderChrome(); renderList(); }
+  else if (b.dataset.life) { lifeAction(b.dataset.life, ITEMS.find((i) => i.id === Number(b.dataset.pid))); }
+  else if (b.dataset.time) { SHIFT = b.dataset.time === '0' ? 0 : SHIFT + DAY; if (selected && !live(ITEMS.find((i) => i.id === selected))) selected = null; save(); renderAll(); }
   else if (b.dataset.join) { const i = Number(b.dataset.join); if (joined.has(i)) { joined.delete(i); save(); renderList(); } else { joined.add(i); renderList(); toast(award('group')); } }
   else if (b.id === 'fab-add') startReport(species === 'all' ? 'lost' : 'lost');
   else if (b.id === 'fab-seen') startReport('seen');
@@ -953,12 +1053,22 @@ document.addEventListener('click', async (e) => {
     else if (act === 'close') { selected = null; renderSheet(); renderList(); drawMap(); }
     else if (act === 'sight') { draft = null; openSighting(it); }
     else if (act === 'poster') openPoster(it);
-    else if (act === 'confirm') { it.confirms = (it.confirms || 0) + 1; renderSheet(); toast(t.confirmed + ' ' + award('hazard')); }
-    else if (act === 'reunite') { ITEMS.splice(ITEMS.indexOf(it), 1); selected = null; save(); const msg = t.reunited + ' ' + award('reunite'); renderAll(); toast(msg); }
+    else if (act === 'confirm') { it.confirms = (it.confirms || 0) + 1; it.confirmedAt = clock(); save(); renderSheet(); renderList(); toast(t.confirmed + ' ' + award('hazard')); }
     else if (act === 'help') toast(award('help'));
     else toast(t.msgProto);
   }
 });
+function lifeAction(act, it) {
+  const t = T[lang];
+  if (!it) return;
+  if (act === 'claim') { it.claim = { who: 'me', at: clock(), note: '' }; toast(t.claimSent); }
+  else if (act === 'ownerConfirm') { it.closed = true; toast(t.closedBy(it.claim.who)); if (selected === it.id) selected = null; }
+  else if (act === 'demoOwner') { it.closed = true; if (selected === it.id) selected = null; toast(t.reunited + ' ' + award('reunite')); }
+  else if (act === 'ownerReject') { it.claim = null; toast(t.rejected); }
+  else if (act === 'still') { it.confirmedAt = clock(); toast(t.confirmedToast(fmtDate(it.confirmedAt + POLL_EVERY))); }
+  else if (act === 'resolved') { it.closed = true; if (selected === it.id) selected = null; toast(t.closedToast); }
+  save(); renderAll();
+}
 const reopenSighting = () => openSighting(ITEMS.find((i) => i.id === draft.sightFor));
 function openPoster(it) {
   const t = T[lang];
@@ -987,5 +1097,6 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { $('modal
 
 renderChrome(); renderList();
 initMap();
+{ const q = ITEMS.find((i) => isOwn(i) && lifecycle(i).state === 'asked'); if (q) setTimeout(() => toast(T[lang].pollToast(titleOf(q))), 1500); }
 new ResizeObserver(() => map && map.resize()).observe(document.querySelector('.mapwrap'));
 </script>
