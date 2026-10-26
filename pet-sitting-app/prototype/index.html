@@ -575,14 +575,20 @@ const visible = () => ITEMS.filter((i) => on[i.type] && baseVisible(i));
 
 // ---------- Map (MapLibre + Wrocław vector tiles bundled with the page) ----------
 const CITY = [16.787, 51.0276, 17.1826, 51.2206];
-let map, markers = [], bundle = null;
-async function loadBundle() {
-  if (bundle) return bundle;
-  const buf = await (await fetch('wroclaw.bin')).arrayBuffer();
-  const n = new DataView(buf).getUint32(0, true);
-  const head = JSON.parse(new TextDecoder().decode(new Uint8Array(buf, 4, n)));
-  bundle = { head, data: new Uint8Array(buf, 4 + n) };
-  return bundle;
+let map, markers = [];
+// Tiles are split into 4 files (under the 16 MB file limit), loaded only when needed:
+// wro0 = zoom 0–13, wro1 = zoom 14, wro2/wro3 = zoom 15 west/east of tile x 17929
+const parts = {};
+let fontsJson = null;
+// Artifacts serve only text/web types, so tiles and glyphs are shipped as base64 text
+function b64bytes(b64) { const s = atob(b64), u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; }
+const partOf = (z, x) => z <= 13 ? 0 : z === 14 ? 1 : x < 17929 ? 2 : 3;
+function loadBundle(i) {
+  return parts[i] ||= fetch(`wro${i}.txt`).then((r) => r.text()).then((b64) => {
+    const buf = b64bytes(b64).buffer;
+    const n = new DataView(buf).getUint32(0, true);
+    return { head: JSON.parse(new TextDecoder().decode(new Uint8Array(buf, 4, n))), data: new Uint8Array(buf, 4 + n) };
+  });
 }
 async function gunzip(bytes) {
   if (bytes[0] !== 0x1f || bytes[1] !== 0x8b) return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
@@ -591,11 +597,13 @@ async function gunzip(bytes) {
 maplibregl.addProtocol('wro', async (params) => {
   const path = params.url.replace('wro://', '');
   if (path.startsWith('fonts/')) {
-    const r = await fetch(path.split('/').map(encodeURIComponent).join('/').replace(/%2F/g, '/'));
-    return { data: r.ok ? await r.arrayBuffer() : new ArrayBuffer(0) };
+    fontsJson ||= fetch('fonts.json').then((r) => r.json());
+    const f = (await fontsJson)[decodeURIComponent(path).slice(6, -4).replace(/ /g, '').replace(/,.*?\//, '/')];
+    return { data: f ? b64bytes(f).buffer : new ArrayBuffer(0) };
   }
-  const b = await loadBundle();
   const key = path.replace(/^t\//, '');
+  const [z, x] = key.split('/').map(Number);
+  const b = await loadBundle(partOf(z, x));
   const e = b.head.tiles[key];
   if (!e) return { data: new ArrayBuffer(0) };
   return { data: await gunzip(b.data.subarray(e[0], e[0] + e[1])) };
@@ -634,7 +642,7 @@ function addOverlayLayers() {
   const o = overlays();
   map.addSource('areas', { type: 'geojson', data: o.areas });
   map.addSource('links', { type: 'geojson', data: o.links });
-  map.addLayer({ id: 'areas-fill', type: 'fill', source: 'areas', paint: { 'fill-color': ['get', 'c'], 'fill-opacity': ['case', ['==', ['get', 'sel'], 1], .2, ['get', 'o']] } });
+  map.addLayer({ id: 'areas-fill', type: 'fill', source: 'areas', paint: { 'fill-color': ['get', 'c'], 'fill-opacity': ['case', ['==', ['get', 'sel'], 1], .13, ['get', 'o']] } });
   map.addLayer({ id: 'areas-line', type: 'line', source: 'areas', paint: { 'line-color': ['get', 'c'], 'line-width': ['case', ['==', ['get', 'sel'], 1], 3, 1.5], 'line-dasharray': [3, 2] } });
   map.addLayer({ id: 'links', type: 'line', source: 'links', paint: { 'line-color': ['get', 'c'], 'line-width': 2, 'line-opacity': .7, 'line-dasharray': [1, 3] } });
 }
