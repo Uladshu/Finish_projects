@@ -30,6 +30,7 @@
 | `docs/product/features/pet-profile.md` | Профиль питомца, медкарта, журналы ухода (11) |
 | `docs/product/features/community.md` | Группы по видам, вопросы, лента, встречи, конкурсы, живая карта (14) |
 | `docs/product/features/help-exchange.md` | Просьбы о помощи, отдам/приму, обмен, «друг животных», адопция (12) |
+| `docs/product/features/gamification.md` | Баллы «лапки» за подтверждённые действия, уровни, медали, рейтинг районов (22) |
 | `docs/product/features/places.md` | Карта: ветклиники 24/7 и для экзотов, площадки, магазины (8) |
 | `docs/product/species.md` | Что важно владельцам собак, кошек, аквариумов, рептилий, птиц, грызунов (12) |
 | `docs/product/sitting.md` | Модуль присмотра (BlaBlaCar): объявления, торг, договорённость, уровни + приоритеты (24) |
@@ -42,8 +43,8 @@
 | `db/schema.sql`, `db/social.sql`, `db/listings.sql` | SQL (читать через grep, см. tech/db.md) |
 | `docs/sources.md` | Все источники (32) |
 | **Прототип** | |
-| `prototype/index.html` | Кликабельный прототип (Leaflet, PL/RU/EN): карта района, зоны поиска потерявшихся, опасности, помощь, отдам, места, группы, плакат с QR, добавление объявления. Опубликован: https://claude.ai/artifact/KrzsrEyS1dAZRkvZCfuAQ9 (~520) |
-| `prototype/map.jpg` | Склеенные тайлы OpenStreetMap z16 (Ołbin–Biskupin), границы в коде (`const B`) |
+| `prototype/index.html` | Кликабельный прототип (Leaflet, PL/RU/EN): карта всего Вроцлава, зоны поиска потерявшихся, опасности, помощь, отдам, места, группы, плакат с QR, добавление объявления, профиль с баллами/уровнями/медалями/рейтингом районов. Опубликован: https://claude.ai/artifact/KrzsrEyS1dAZRkvZCfuAQ9 (~640) |
+| `prototype/city.jpg`, `prototype/map.jpg` | Тайлы OSM: весь Вроцлав z14 (`const CB`) + детальный район Ołbin–Biskupin z16 (`const B`) |
 
 ## Приоритет «Запуск» (кратко, детали — в features/)
 Потерялся/нашёлся + push по радиусу + плакат с QR · предупреждения об отраве · просьбы о помощи (вкл. присмотр)
