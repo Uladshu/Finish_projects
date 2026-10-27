@@ -9,7 +9,7 @@
 /* Layout: left panel (species → types → dates → search → results) beside a vector map of Wrocław; on phones the map sits on top. */
 :root {
   --bg: #f0f0f0; --panel: #ffffff; --ink: #000000; --muted: #707070; --line: #dadada; --chip: #f0f0f0;
-  --accent: #f63f3f; --accent-ink: #ffffff;
+  --accent: #f63f3f; --accent-ink: #ffffff; --navbg: #f6f6f6;
   --lost: #f63f3f; --found: #1f9d55; --seen: #0b84a5; --help: #2f63c7; --give: #8a5bc7; --hazard: #e58a00; --place: #2a2a2a;
   --shadow: 0 4px 18px rgba(0, 0, 0, .12);
   --f-display: "Montserrat", "Segoe UI", system-ui, sans-serif;
@@ -17,12 +17,12 @@
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #141414; --panel: #1e1e1e; --ink: #f2f2f2; --muted: #a3a3a3; --line: #3a3a3a; --chip: #2a2a2a;
-  --accent: #ff5a5a; --accent-ink: #ffffff;
+  --accent: #ff5a5a; --accent-ink: #ffffff; --navbg: #1a1a1a;
   --lost: #ff5a5a; --found: #4cc985; --seen: #3fb6d4; --help: #79a2ff; --give: #c39bff; --hazard: #ffb340; --place: #d0d0d0;
   --shadow: 0 6px 24px rgba(0, 0, 0, .5); color-scheme: dark; } }
 :root[data-theme="dark"] {
   --bg: #141414; --panel: #1e1e1e; --ink: #f2f2f2; --muted: #a3a3a3; --line: #3a3a3a; --chip: #2a2a2a;
-  --accent: #ff5a5a; --accent-ink: #ffffff;
+  --accent: #ff5a5a; --accent-ink: #ffffff; --navbg: #1a1a1a;
   --lost: #ff5a5a; --found: #4cc985; --seen: #3fb6d4; --help: #79a2ff; --give: #c39bff; --hazard: #ffb340; --place: #d0d0d0;
   --shadow: 0 6px 24px rgba(0, 0, 0, .5); color-scheme: dark; }
 
@@ -291,27 +291,38 @@ body { font-weight: 500; font-size: 14px; }
 .step:not(:last-child)::after { content: ""; position: absolute; left: 16px; top: 32px; bottom: 0; border-left: 2px dotted var(--accent); }
 .step span { font-size: 13px; line-height: 1.45; padding-top: 5px; }
 .bnav { display: none; }
+.msheet-bg { place-items: end stretch; padding: 0; }
+.msheet { background: var(--panel); border-radius: 18px 18px 0 0; padding-block: 18px calc(16px + env(safe-area-inset-bottom, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 4px; max-height: 85vh; overflow-y: auto; }
+.msheet .mrow { display: flex; align-items: center; gap: 14px; width: 100%; border: 0; border-bottom: 1px solid var(--line); background: none; padding: 14px 4px; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer; color: var(--ink); }
+.msheet .mrow svg { width: 22px; height: 22px; fill: var(--muted); flex: none; }
+.msheet .mrow small { margin-left: auto; color: var(--muted); font-weight: 500; }
+.msheet .mrow b { background: var(--accent); color: #fff; border-radius: 999px; font-size: 11px; padding: 1px 7px; margin-left: auto; }
+.msheet .mlangs { display: flex; gap: 8px; padding: 12px 4px; align-items: center; font-weight: 600; }
+.msheet .mlangs button { border: 2px solid var(--line); background: var(--panel); border-radius: 999px; padding: 6px 14px; font-weight: 700; cursor: pointer; }
+.msheet .mlangs button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
 .panel, .head, .brand, .search, .sbox { min-width: 0; }
 .brand { gap: 6px; } .brand h1.logo { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .search { gap: 6px; } .fbtn { padding: 8px 12px; }
 .langs button { padding: 5px 7px; }
 @media (max-width: 760px) {
-  body { padding-bottom: calc(58px + env(safe-area-inset-bottom, 0px)); box-sizing: border-box; }
+  body { padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px)); box-sizing: border-box; }
   .tabs, #fab-add { display: none; }
   .panel, .head, .brand, .search { min-width: 0; }
   .brand { gap: 6px; } .brand h1.logo { font-size: 14px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .lvl { padding: 4px 8px 4px 4px; } .lvl span { font-size: 11px; }
   .langs button { padding: 5px 6px; }
   .search { gap: 6px; } .fbtn { padding: 8px 11px; } .search input { padding-right: 8px; }
-  .bnav { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 1200; background: var(--panel); border-top: 1px solid var(--line);
-    padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); height: calc(58px + env(safe-area-inset-bottom, 0px)); }
-  .bnav button { border: 0; background: none; display: grid; justify-items: center; align-content: center; gap: 3px; font-size: 10px; font-weight: 500; color: var(--muted); cursor: pointer; position: relative; }
-  .bnav button svg { width: 22px; height: 22px; fill: currentColor; }
+  .langs { display: none; }
+  .bnav { display: grid; grid-template-columns: repeat(5, 1fr); align-items: end; position: fixed; left: 0; right: 0; bottom: 0; z-index: 1200; background: var(--navbg); border-top: 1px solid var(--line);
+    padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); height: calc(62px + env(safe-area-inset-bottom, 0px)); }
+  .bnav button { border: 0; background: none; height: 62px; display: grid; justify-items: center; align-content: center; gap: 4px; font-size: 11px; font-weight: 500; color: #8e8e8e; cursor: pointer; position: relative; }
+  .bnav button svg { width: 26px; height: 26px; fill: currentColor; }
   .bnav button[aria-current="true"] { color: var(--accent); }
-  .bnav .add svg { width: 40px; height: 40px; padding: 9px; box-sizing: border-box; border-radius: 50%; background: var(--accent); fill: #fff; margin-top: -14px; box-shadow: 0 4px 12px rgba(246,63,63,.4); }
-  .bnav .add { color: var(--accent); }
-  .bnav b { position: absolute; top: 4px; left: 50%; margin-left: 6px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 10px; display: grid; place-items: center; }
-  .toast { bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
+  .bnav .center { align-content: end; padding-bottom: 7px; color: var(--ink); font-weight: 700; }
+  .bnav .center svg { width: 62px; height: 62px; padding: 15px; box-sizing: border-box; border-radius: 50%; background: var(--accent); fill: #fff; border: 4px solid var(--navbg); margin-top: -26px; box-shadow: 0 6px 16px rgba(246,63,63,.35); }
+  .bnav .center[aria-current="true"] { color: var(--accent); }
+  .bnav b { position: absolute; top: 6px; left: 50%; margin-left: 6px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 10px; display: grid; place-items: center; }
+  .toast { bottom: calc(78px + env(safe-area-inset-bottom, 0px)); }
   .citypop { top: auto; bottom: 12px; }
   .fpanel { z-index: 1500; }
   .fpanel .species { grid-template-columns: repeat(4, 1fr); }
@@ -365,6 +376,7 @@ body { font-weight: 500; font-size: 14px; }
   </main>
 </div>
 <nav class="bnav" id="bnav" aria-label="Menu"></nav>
+<div class="backdrop msheet-bg" id="menu" hidden><div class="msheet" id="menu-body"></div></div>
 <div class="backdrop" id="modal" hidden><div class="modal" id="modal-body"></div></div>
 <div class="lightbox" id="lightbox" hidden></div>
 <div class="toast" id="toast" hidden></div>
@@ -393,6 +405,8 @@ const G = {
   plus: svg('<path d="M10.5 3h3v7.5H21v3h-7.5V21h-3v-7.5H3v-3h7.5z"/>'),
   loc: svg('<path d="M12 2a7 7 0 0 1 7 7c0 5.2-7 13-7 13S5 14.2 5 9a7 7 0 0 1 7-7zm0 4.3a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4z"/>'),
   filter: svg('<path d="M3 5h18l-7 8.2V19l-4 2v-7.8z"/>'),
+  map: svg('<path d="M9 3 3 5.5v15.5l6-2.5 6 2.5 6-2.5V3l-6 2.5L9 3zm1 2.9 4 1.6v11.6l-4-1.6V5.9z"/>'),
+  menu: svg('<path d="M3 5.5h18v2.2H3zm0 5.4h18v2.2H3zm0 5.4h18v2.2H3z"/>'),
   medal: svg('<path d="M7 2h4l1 4 1-4h4l-3 7a6 6 0 1 1-4 0L7 2zm5 9a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>')
 };
 const SPECIES = ['all', 'dog', 'cat', 'bird', 'rodent', 'reptile', 'fish', 'other'];
@@ -596,11 +610,11 @@ Object.assign(T.en, { whereL: 'Where?', wherePh: 'Type a street, district or par
 Object.assign(T.pl, { back: '← Wstecz', backTitle: 'Wróć bez zmian', filters: 'Filtry', freset: 'Wyczyść', show: (n) => `Pokaż (${n})` });
 Object.assign(T.ru, { back: '← Назад', backTitle: 'Вернуться без изменений', filters: 'Фильтры', freset: 'Сбросить', show: (n) => `Показать (${n})` });
 Object.assign(T.en, { back: '← Back', backTitle: 'Go back without changes', filters: 'Filters', freset: 'Reset', show: (n) => `Show (${n})` });
-Object.assign(T.pl, { cityQ: 'Twoje miasto', yes: 'Tak', otherCity: 'Wybierz inne miasto', otherMsg: 'Na start działamy we Wrocławiu. Inne miasta wkrótce — zapiszemy Cię na listę oczekujących.',
+Object.assign(T.pl, { menu: 'Menu', mProfile: 'Mój profil i łapki', mPosts: 'Moje ogłoszenia', mLang: 'Język', mCity: 'Miasto', mAbout: 'O aplikacji', aboutTxt: 'Łapka — sąsiedzka pomoc dla właścicieli zwierząt we Wrocławiu. To jest prototyp: dane są przykładowe.', close: 'Zamknij', cityQ: 'Twoje miasto', yes: 'Tak', otherCity: 'Wybierz inne miasto', otherMsg: 'Na start działamy we Wrocławiu. Inne miasta wkrótce — zapiszemy Cię na listę oczekujących.',
   stepsT: 'Jak szukać swojego zwierzęcia?', steps: ['W filtrach wybierz gatunek i okres', 'Przejrzyj zdjęcia znalezionych i widzianych zwierząt', 'Kliknij zdjęcie — zobaczysz miejsce na mapie', 'Napisz „To moje zwierzę?” i umów się na odbiór'] });
-Object.assign(T.ru, { cityQ: 'Ваш город', yes: 'Да', otherCity: 'Выбрать другой город', otherMsg: 'На старте работаем во Вроцлаве. Другие города скоро — запишем вас в лист ожидания.',
+Object.assign(T.ru, { menu: 'Меню', mProfile: 'Мой профиль и лапки', mPosts: 'Мои объявления', mLang: 'Язык', mCity: 'Город', mAbout: 'О приложении', aboutTxt: 'Łapka — соседская помощь владельцам животных во Вроцлаве. Это прототип: данные — примеры.', close: 'Закрыть', cityQ: 'Ваш город', yes: 'Да', otherCity: 'Выбрать другой город', otherMsg: 'На старте работаем во Вроцлаве. Другие города скоро — запишем вас в лист ожидания.',
   stepsT: 'Как найти своё животное?', steps: ['В фильтрах выберите вид и период', 'Пролистайте фото найденных и замеченных животных', 'Нажмите на фото — увидите место на карте', 'Напишите «Это моё животное?» и договоритесь о встрече'] });
-Object.assign(T.en, { cityQ: 'Your city', yes: 'Yes', otherCity: 'Choose another city', otherMsg: 'We start in Wrocław. Other cities soon — we will add you to the waiting list.',
+Object.assign(T.en, { menu: 'Menu', mProfile: 'My profile and paws', mPosts: 'My posts', mLang: 'Language', mCity: 'City', mAbout: 'About', aboutTxt: 'Łapka — neighbourly help for pet owners in Wrocław. This is a prototype: data are examples.', close: 'Close', cityQ: 'Your city', yes: 'Yes', otherCity: 'Choose another city', otherMsg: 'We start in Wrocław. Other cities soon — we will add you to the waiting list.',
   stepsT: 'How to find your pet?', steps: ['In filters pick the species and period', 'Browse photos of found and spotted animals', 'Tap a photo to see the place on the map', 'Write “Is this my pet?” and arrange the pickup'] });
 // ---------- Example data (not real people or events). `min` = minutes ago ----------
 const L3 = (pl, ru, en) => ({ pl, ru, en });
@@ -794,6 +808,16 @@ const baseVisible = (it) => live(it) && speciesMatch(it) && periodMatch(it) && q
 let galF = 'all', fOpen = false, fSnap = null, citySeen = false;
 // Filters panel: opening remembers the current filters so "Back" can restore them
 const snapFilters = () => ({ species, period, galF, on: { ...on } });
+function openMenu() {
+  const t = T[lang], pend = ITEMS.filter(ownPending).length;
+  $('menu-body').innerHTML = `<div class="fhead" style="justify-content:space-between"><b>${t.menu}</b><button class="x" data-menu="close" aria-label="${t.close}">×</button></div>
+    <button class="mrow" data-menu="profile">${G.paw}${t.mProfile}<small>${score()} ${t.pts}</small></button>
+    <button class="mrow" data-menu="posts">${G.box}${t.mPosts}${pend ? `<b>${pend}</b>` : ''}</button>
+    <div class="mlangs">${G.all.replace('<svg', '<svg width="0" height="0" style="display:none"')}${t.mLang}: ${['pl', 'ru', 'en'].map((l) => `<button data-ml="${l}" aria-pressed="${lang === l}">${l.toUpperCase()}</button>`).join('')}</div>
+    <button class="mrow" data-menu="city">${G.loc}${t.mCity}<small>Wrocław</small></button>
+    <button class="mrow" data-menu="about">${G.heart}${t.mAbout}</button>`;
+  $('menu').hidden = false;
+}
 function cancelFilters() { if (fSnap) { ({ species, period, galF } = fSnap); Object.assign(on, fSnap.on); } fSnap = null; fOpen = false; renderAll(); }
 const inGallery = (i) => (i.type === 'found' || i.type === 'seen') && (galF === 'all' || i.type === galF);
 const visible = () => ITEMS.filter((i) => (tab === 'gallery' ? inGallery(i) : on[i.type]) && baseVisible(i));
@@ -908,9 +932,11 @@ function renderChrome() {
   ['pl', 'ru', 'en'].forEach((l) => $('lang-' + l).setAttribute('aria-pressed', String(l === lang)));
   ['feed', 'gallery', 'groups', 'profile'].forEach((k) => { $('tab-' + k).textContent = t[k]; $('tab-' + k).setAttribute('aria-selected', String(tab === k)); });
   const pend = ITEMS.filter(ownPending).length;
-  const nav = [['feed', G.loc, t.feed], ['gallery', G.all, t.gallery], ['add', G.plus, t.addFab], ['groups', G.heart, t.groups], ['profile', G.paw, t.profile]];
-  $('bnav').innerHTML = nav.map(([k, g, l]) => k === 'add' ? `<button class="add" id="bnav-add">${g}${l}</button>`
-    : `<button data-tab="${k}" aria-current="${tab === k}">${g}${l}${k === 'profile' && pend ? `<b>${pend}</b>` : ''}</button>`).join('');
+  $('bnav').innerHTML = `<button data-tab="gallery" aria-current="${tab === 'gallery'}">${G.all}${t.gallery}</button>
+    <button id="bnav-add">${G.plus}${t.addFab}</button>
+    <button class="center" data-tab="feed" aria-current="${tab === 'feed'}">${G.map}${t.feed}</button>
+    <button data-tab="groups" aria-current="${tab === 'groups'}">${G.heart}${t.groups}</button>
+    <button id="bnav-menu" aria-current="${tab === 'profile'}">${G.menu}${t.menu}${pend ? `<b>${pend}</b>` : ''}</button>`;
   let cityOk = false; try { cityOk = localStorage.getItem('lapka-city') === 'wroclaw'; } catch (e) {}
   $('citypop').hidden = cityOk || citySeen;
   if (!$('citypop').hidden) $('citypop').innerHTML = `<div>${t.cityQ}: <b>Wrocław</b>?</div><div class="actions"><button class="btn primary" id="city-yes">${t.yes}</button><button class="btn link" id="city-other">${t.otherCity}</button></div>`;
@@ -1260,6 +1286,14 @@ document.addEventListener('click', async (e) => {
   else if (b.id === 'city-yes') { citySeen = true; try { localStorage.setItem('lapka-city', 'wroclaw'); } catch (err) {} renderChrome(); }
   else if (b.id === 'city-other') { citySeen = true; renderChrome(); toast(t.otherMsg); }
   else if (b.id === 'bnav-add') { draft = null; startReport('lost'); }
+  else if (b.id === 'bnav-menu') openMenu();
+  else if (b.dataset.menu) {
+    const m = b.dataset.menu; $('menu').hidden = true;
+    if (m === 'profile' || m === 'posts') { tab = 'profile'; renderAll(); }
+    else if (m === 'city') { citySeen = false; try { localStorage.removeItem('lapka-city'); } catch (err) {} renderChrome(); }
+    else if (m === 'about') toast(t.aboutTxt);
+  }
+  else if (b.dataset.ml) { lang = b.dataset.ml; save(); renderAll(); openMenu(); }
   else if (b.id === 'ftoggle') { if (!fOpen) fSnap = snapFilters(); fOpen = !fOpen; renderChrome(); }
   else if (b.id === 'fdone') { fOpen = false; fSnap = null; renderChrome(); }
   else if (b.id === 'fback') cancelFilters();
@@ -1388,6 +1422,7 @@ document.addEventListener('input', async (e) => {
   box.hidden = !list.length;
 });
 $('q').addEventListener('input', (e) => { query = e.target.value.trim(); renderChrome(); renderList(); drawMap(); });
+$('menu').addEventListener('click', (e) => { if (e.target === $('menu')) $('menu').hidden = true; });
 $('modal').addEventListener('click', (e) => { if (e.target === $('modal')) { $('modal').hidden = true; draft = null; } });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && fOpen && $('modal').hidden) { cancelFilters(); return; } if (e.key === 'Escape') { $('modal').hidden = true; $('lightbox').hidden = true; if (pick) { endPick(); draft = null; } } });
 
