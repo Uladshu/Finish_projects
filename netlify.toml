@@ -1,0 +1,9 @@
+# Netlify: every push to the branch rebuilds and publishes the Pupil Obok site automatically.
+[build]
+  command = "python3 pet-sitting-app/prototype/build_site.py"
+  publish = "pet-sitting-app/prototype/dist"
+
+[[headers]]
+  for = "/*.txt"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
