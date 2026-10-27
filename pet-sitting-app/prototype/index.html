@@ -394,7 +394,7 @@ body { font-weight: 500; font-size: 14px; }
   </main>
 </div>
 <nav class="bnav" id="bnav" aria-label="Menu"></nav>
-<div class="backdrop msheet-bg" id="menu" hidden><div class="msheet" id="menu-body"></div></div>
+<div class="backdrop msheet-bg" id="menu" style="z-index:2100" hidden><div class="msheet" id="menu-body"></div></div>
 <div class="backdrop" id="modal" hidden><div class="modal" id="modal-body"></div></div>
 <div class="lightbox" id="lightbox" hidden></div>
 <div class="toast" id="toast" hidden></div>
@@ -661,6 +661,27 @@ Object.assign(T.ru, { svHead: 'Помогите улучшить Pupil Obok', sv
 Object.assign(T.en, { svHead: 'Help us improve Pupil Obok', svNext: 'Next', svSkip: 'Skip', svThanks: 'Thank you! Your answers are saved.', svPh: 'Write briefly…', svMenu: 'Questions for you',
   svQ: { pet: 'Which pet do you have?', lost_before: 'Have you ever lost a pet or found someone else\'s?', where_help: 'Where would you look for help if a pet went missing?', rating: 'How do you rate this app?', first_use: 'What would you use first?', recommend: 'Would you recommend it to friends?', would_help: 'Would you help a neighbour with their pet?', district: 'Where do you live?', missing: 'What is missing here?' },
   svO: { dog: 'Dog', cat: 'Cat', bird: 'Bird', rodent: 'Rodent / rabbit', reptile: 'Reptile', fish: 'Fish', none: 'No pet', lost: 'Lost one', found: 'Found one', both: 'Both', never: 'Never', fb: 'FB groups', posters: 'Posters', olx: 'OLX', shelter: 'Shelter / city guard', vet: 'Vet', app: 'An app', lostfound: 'Lost / found', gallery: 'Found gallery', poison: 'Poison alerts', help: 'Neighbour help', give: 'Give away / need', groups: 'Groups', yes: 'Yes', maybe: 'Maybe', no: 'No', free: 'Yes, for free', paid: 'Yes, paid', stare: 'Old Town', srodmiescie: 'Śródmieście', krzyki: 'Krzyki', fabryczna: 'Fabryczna', psiepole: 'Psie Pole', outside: 'Outside Wrocław' } });
+Object.assign(T.pl, { geoT: 'Brak dostępu do lokalizacji', geoWhy: 'Przeglądarka nie pozwala odczytać GPS. Włącz to w kilka sekund albo wybierz miejsce inaczej:',
+  geoIOS: 'iPhone: Ustawienia → Prywatność i ochrona → Usługi lokalizacji → Safari (lub Chrome) → „Podczas używania”. Potem odśwież stronę.',
+  geoAndroid: 'Android: dotknij kłódki obok adresu strony → Uprawnienia → Lokalizacja → Zezwalaj. Sprawdź też, czy lokalizacja w telefonie jest włączona.',
+  geoDesktop: 'Komputer: kliknij kłódkę obok adresu strony → Lokalizacja → Zezwalaj, potem odśwież stronę.',
+  geoPreview: 'W tym podglądzie GPS jest zawsze zablokowany — na pupilobok.pl zadziała.', geoRetry: 'Spróbuj ponownie', geoLast: (n) => `Użyj ostatniego miejsca: ${n}`,
+  geoType: 'Wpisz adres', geoMap: 'Wskaż na mapie', geoTipPaste: 'W pole adresu możesz też wkleić link z Google Maps albo współrzędne.', geoTipPhoto: 'Dodaj zdjęcie z telefonu — jeśli ma zapisane miejsce, użyjemy go.',
+  coordsSug: 'Współrzędne', photoLoc: 'Wzięliśmy miejsce ze zdjęcia — sprawdź je na mapie.' });
+Object.assign(T.ru, { geoT: 'Нет доступа к местоположению', geoWhy: 'Браузер не даёт прочитать GPS. Включите за пару секунд или укажите место иначе:',
+  geoIOS: 'iPhone: Настройки → Конфиденциальность и безопасность → Службы геолокации → Safari (или Chrome) → «При использовании». Затем обновите страницу.',
+  geoAndroid: 'Android: нажмите замок рядом с адресом сайта → Разрешения → Местоположение → Разрешить. Проверьте, что геолокация в телефоне включена.',
+  geoDesktop: 'Компьютер: нажмите замок рядом с адресом сайта → Местоположение → Разрешить, затем обновите страницу.',
+  geoPreview: 'В этом предпросмотре GPS всегда заблокирован — на pupilobok.pl будет работать.', geoRetry: 'Попробовать снова', geoLast: (n) => `Последнее место: ${n}`,
+  geoType: 'Ввести адрес', geoMap: 'Указать на карте', geoTipPaste: 'В поле адреса можно вставить ссылку из Google Maps или координаты.', geoTipPhoto: 'Добавьте фото с телефона — если в нём сохранено место, мы его используем.',
+  coordsSug: 'Координаты', photoLoc: 'Место взяли из фото — проверьте его на карте.' });
+Object.assign(T.en, { geoT: 'No access to your location', geoWhy: 'The browser does not allow reading GPS. Turn it on in seconds or pick the place another way:',
+  geoIOS: 'iPhone: Settings → Privacy & Security → Location Services → Safari (or Chrome) → “While Using”. Then reload the page.',
+  geoAndroid: 'Android: tap the lock next to the address → Permissions → Location → Allow. Also check that location is on in your phone.',
+  geoDesktop: 'Computer: click the lock next to the address → Location → Allow, then reload the page.',
+  geoPreview: 'This preview always blocks GPS — it will work on pupilobok.pl.', geoRetry: 'Try again', geoLast: (n) => `Use last place: ${n}`,
+  geoType: 'Type an address', geoMap: 'Pick on the map', geoTipPaste: 'You can also paste a Google Maps link or coordinates into the address field.', geoTipPhoto: 'Add a photo from your phone — if it has a saved location, we will use it.',
+  coordsSug: 'Coordinates', photoLoc: 'We took the place from the photo — check it on the map.' });
 // ---------- Example data (not real people or events). `min` = minutes ago ----------
 const L3 = (pl, ru, en) => ({ pl, ru, en });
 const ITEMS = [
@@ -1318,7 +1339,7 @@ function openSighting(it) {
 }
 let pickPin = null;
 function setPickPoint(ll, fly) {
-  draft.point = { lat: ll.lat, lng: ll.lng };
+  draft.point = { lat: ll.lat, lng: ll.lng }; rememberPlace(draft.point, draft.street);
   if (!pickPin) {
     const el = document.createElement('div'); el.className = 'pickpin';
     pickPin = new maplibregl.Marker({ element: el, draggable: true, anchor: 'bottom-left', offset: [-2, 2] });
@@ -1412,6 +1433,22 @@ document.addEventListener('click', async (e) => {
   else if (b.dataset.nt) { readForm(); draft.type = b.dataset.nt; openForm(); }
   else if (b.dataset.rmph) { readForm(); draft.photos.splice(Number(b.dataset.rmph), 1); draft.sightFor ? reopenSighting() : openForm(); }
   else if (b.id === 'nf-cancel') { draft = null; $('modal').hidden = true; }
+  else if (b.dataset.geo) {
+    const g = b.dataset.geo, inForm = $('menu').dataset.form === '1', last = lastPlace();
+    $('menu').hidden = true;
+    if (g === 'retry') (inForm ? $('nf-locate') : $('fab-loc')).click();
+    else if (g === 'last' && last) {
+      if (inForm) { draft.point = { lat: last.lat, lng: last.lng }; draft.street = last.street || draft.street; draft.sightFor ? reopenSighting() : openForm(); }
+      else { showMe(last); map.flyTo({ center: [last.lng, last.lat], zoom: 15.5 }); }
+    }
+    else if (g === 'type') $('nf-street').focus();
+    else if (g === 'map') { readForm(); draft.point = null; startPick(); }
+  }
+  else if (b.dataset.coord) {
+    const [lat, lng] = b.dataset.coord.split(',').map(Number);
+    readForm(); draft.point = { lat, lng }; draft.streetAuto = true; draft.street = await nearestStreet(lat, lng) || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    rememberPlace(draft.point, draft.street); draft.sightFor ? reopenSighting() : openForm();
+  }
   else if (b.dataset.sug != null) {
     const s = (await suggest($('nf-street').value))[Number(b.dataset.sug)]; if (!s) return;
     readForm(); draft.street = s.n; draft.streetAuto = false; draft.point = { lat: s.lat, lng: s.lng };
@@ -1420,15 +1457,15 @@ document.addEventListener('click', async (e) => {
   else if (b.id === 'nf-locate') {
     readForm(); toast(t.locating);
     try {
-      const p = await locate(); draft.point = p; draft.streetAuto = true; draft.street = await nearestStreet(p.lat, p.lng) || draft.street;
+      const p = await locate(); draft.point = p; draft.streetAuto = true; draft.street = await nearestStreet(p.lat, p.lng) || draft.street; rememberPlace(p, draft.street);
       if (!inCity(p)) toast(t.outside); else $('toast').hidden = true;
       draft.sightFor ? reopenSighting() : openForm();
-    } catch (err) { toast(t.geoFail); }
+    } catch (err) { $('toast').hidden = true; geoHelp(true); }
   }
   else if (b.id === 'fab-loc') {
     toast(t.locating);
     try { const p = await locate(); showMe(p); map.flyTo({ center: [p.lng, p.lat], zoom: 15.5 }); $('toast').hidden = true; if (!inCity(p)) toast(t.outside); }
-    catch (err) { toast(t.geoFail); }
+    catch (err) { $('toast').hidden = true; geoHelp(false); }
   }
   else if (b.id === 'nf-next') {
     readForm();
@@ -1486,6 +1523,51 @@ function locate() {
     navigator.geolocation.getCurrentPosition((p) => res({ lat: p.coords.latitude, lng: p.coords.longitude }), rej, { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 });
   });
 }
+// ---------- When GPS is blocked: instructions for this device + fallbacks (last place, address, map, pasted link/coords, photo EXIF)
+const lastPlace = () => { try { return JSON.parse(localStorage.getItem('pupil-last') || 'null'); } catch (e) { return null; } };
+const rememberPlace = (p, street) => { try { localStorage.setItem('pupil-last', JSON.stringify({ lat: p.lat, lng: p.lng, street: street || '' })); } catch (e) {} };
+function parseCoords(text) {
+  const m = /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/.exec(text) || /(-?\d{1,2}\.\d{3,})\s*[,;\s]\s*(-?\d{1,3}\.\d{3,})/.exec(text);
+  if (!m) return null;
+  const lat = +m[1], lng = +m[2];
+  return Math.abs(lat) <= 90 && Math.abs(lng) <= 180 ? { lat, lng } : null;
+}
+async function exifGps(file) { // reads GPS from a JPEG's EXIF (before compression strips it)
+  try {
+    const v = new DataView(await file.slice(0, 256 * 1024).arrayBuffer());
+    if (v.getUint16(0) !== 0xffd8) return null;
+    let o = 2;
+    while (o < v.byteLength - 4) {
+      const mk = v.getUint16(o), len = v.getUint16(o + 2);
+      if (mk === 0xffe1 && v.getUint32(o + 4) === 0x45786966) {
+        const t = o + 10, le = v.getUint16(t) === 0x4949, u16 = (x) => v.getUint16(t + x, le), u32 = (x) => v.getUint32(t + x, le);
+        const ifd = (off) => { const n = u16(off), r = {}; for (let i = 0; i < n; i++) { const e = off + 2 + i * 12; r[u16(e)] = e; } return r; };
+        const ifd0 = ifd(u32(4)); if (!ifd0[0x8825]) return null;
+        const g = ifd(u32(ifd0[0x8825] + 8));
+        const rat = (e) => { const off = u32(e + 8); const q = (k) => u32(off + k * 8) / (u32(off + k * 8 + 4) || 1); return q(0) + q(1) / 60 + q(2) / 3600; };
+        const ref = (e) => String.fromCharCode(v.getUint8(t + e + 8));
+        if (!g[2] || !g[4]) return null;
+        let lat = rat(g[2]), lng = rat(g[4]);
+        if (g[1] && ref(g[1]) === 'S') lat = -lat; if (g[3] && ref(g[3]) === 'W') lng = -lng;
+        return lat || lng ? { lat, lng } : null;
+      }
+      if ((mk & 0xff00) !== 0xff00) break; o += 2 + len;
+    }
+  } catch (e) {}
+  return null;
+}
+function geoHelp(inForm) {
+  const t = T[lang], ua = navigator.userAgent, last = lastPlace();
+  const how = /iPhone|iPad|iPod/.test(ua) ? t.geoIOS : /Android/.test(ua) ? t.geoAndroid : t.geoDesktop;
+  $('menu-body').innerHTML = `<div class="fhead" style="justify-content:space-between"><b>${t.geoT}</b><button class="x" data-geo="close" aria-label="${t.close}">×</button></div>
+    <p style="margin:0;line-height:1.45">${t.geoWhy}</p>
+    <div class="note">${how}${window.claude ? `<br><small>${t.geoPreview}</small>` : ''}</div>
+    <button class="btn" data-geo="retry">${G.loc.replace('<svg', '<svg width="16" height="16" style="fill:currentColor;vertical-align:-3px"')} ${t.geoRetry}</button>
+    ${last ? `<button class="btn primary" data-geo="last">${esc(t.geoLast(last.street || `${last.lat.toFixed(4)}, ${last.lng.toFixed(4)}`))}</button>` : ''}
+    ${inForm ? `<button class="btn" data-geo="type">${t.geoType}</button><button class="btn" data-geo="map">${t.geoMap}</button>` : ''}
+    <p class="count" style="margin:4px 0 0;line-height:1.45">${t.geoTipPaste}<br>${t.geoTipPhoto}</p>`;
+  $('menu').dataset.form = inForm ? '1' : ''; $('menu').hidden = false;
+}
 const inCity = (p) => p.lng >= CITY[0] && p.lng <= CITY[2] && p.lat >= CITY[1] && p.lat <= CITY[3];
 let meMarker = null;
 function showMe(p) {
@@ -1511,7 +1593,9 @@ document.addEventListener('change', async (e) => {
   if (e.target.id === 'ph-input') {
     readForm();
     const files = [...e.target.files].slice(0, 8 - (draft.photos || []).length);
-    for (const file of files) { const d = await compress(file); if (d) draft.photos.push(d); }
+    let fromPhoto = null;
+    for (const file of files) { if (!draft.point && !fromPhoto) fromPhoto = await exifGps(file); const d = await compress(file); if (d) draft.photos.push(d); }
+    if (fromPhoto) { draft.point = fromPhoto; draft.streetAuto = true; draft.street = await nearestStreet(fromPhoto.lat, fromPhoto.lng) || draft.street; rememberPlace(fromPhoto, draft.street); toast(T[lang].photoLoc); }
     draft.sightFor ? reopenSighting() : openForm();
   } else if (e.target.id === 'nf-species' && draft) { readForm(); openForm(); }
 });
@@ -1519,8 +1603,9 @@ document.addEventListener('input', async (e) => {
   if (e.target.id !== 'nf-street') return;
   if (draft) { draft.street = e.target.value; draft.streetAuto = false; }
   const list = await suggest(e.target.value), box = $('sugg'); if (!box) return;
-  box.innerHTML = list.map((s, i) => `<button type="button" data-sug="${i}">${esc(s.n)}<small>${T[lang].kinds[s.k]}</small></button>`).join('');
-  box.hidden = !list.length;
+  const c = parseCoords(e.target.value);
+  box.innerHTML = (c ? `<button type="button" data-coord="${c.lat},${c.lng}">${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}<small>${T[lang].coordsSug}</small></button>` : '') + list.map((s, i) => `<button type="button" data-sug="${i}">${esc(s.n)}<small>${T[lang].kinds[s.k]}</small></button>`).join('');
+  box.hidden = !c && !list.length;
 });
 $('q').addEventListener('input', (e) => { query = e.target.value.trim(); renderChrome(); renderList(); drawMap(); });
 $('menu').addEventListener('click', (e) => { if (e.target === $('menu')) $('menu').hidden = true; });
