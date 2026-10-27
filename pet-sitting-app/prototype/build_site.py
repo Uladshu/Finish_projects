@@ -13,7 +13,12 @@ head = ('<!doctype html><html lang="pl"><head><meta charset="utf-8">'
 (dist / 'index.html').write_text(head + page.replace('<meta charset="utf-8">', '', 1) + '</body></html>', encoding='utf-8')
 for f in ['streets.json', 'fonts.json', 'wro0.txt', 'wro1.txt', 'wro2.txt', 'wro3.txt']:
     shutil.copy(here / f, dist / f)
+for f in (here / 'launch').iterdir():  # one-click local test: Windows .bat + PowerShell server, Mac/Linux .command, instructions
+    shutil.copy(f, dist / f.name)
 with zipfile.ZipFile(here / 'pupilobok-site.zip', 'w', zipfile.ZIP_DEFLATED) as z:
     for f in dist.iterdir():
-        z.write(f, f.name)
+        info = zipfile.ZipInfo(f.name, date_time=(2026, 10, 27, 12, 0, 0))
+        info.compress_type = zipfile.ZIP_DEFLATED
+        info.external_attr = (0o755 if f.suffix in ('.command', '.sh') else 0o644) << 16
+        z.writestr(info, f.read_bytes())
 print('dist/ ready,', round((here / 'pupilobok-site.zip').stat().st_size / 1e6, 1), 'MB zip')

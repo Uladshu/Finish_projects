@@ -1,0 +1,24 @@
+PUPIL OBOK - test na Twoim komputerze
+=====================================
+
+1. Rozpakuj ten plik ZIP do zwyklego folderu (np. na Pulpit). Nie uruchamiaj ze srodka ZIP-a.
+
+2. Uruchom:
+   - Windows: dwuklik "Uruchom-Windows.bat".
+     Jesli pojawi sie "System Windows ochronil ten komputer": "Wiecej informacji" -> "Uruchom mimo to".
+   - Mac: prawy przycisk na "Uruchom-Mac.command" -> "Otworz" -> "Otworz"
+     (za pierwszym razem macOS pyta, bo plik pochodzi z internetu).
+     Jesli Mac poprosi o "narzedzia wiersza polecen" - zgodz sie i uruchom ponownie.
+   - Linux: w terminalu: ./Uruchom-Mac.command
+
+3. Przegladarka otworzy sie sama na http://localhost:8000
+   (jesli nie - wpisz ten adres recznie). Okno z czarnym tlem zostaw otwarte.
+
+4. Zamknij okno z czarnym tlem, aby zatrzymac strone.
+
+Wazne:
+- Nie otwieraj index.html dwuklikiem - wtedy mapa sie nie zaladuje (przegladarka blokuje pliki z dysku).
+- Na localhost przegladarka normalnie zapyta o lokalizacje ("Pokaz zwierzeta obok mnie").
+- Wszystko, co dodasz (zgloszenia, zdjecia, odpowiedzi ankiety), zapisuje sie tylko w tej przegladarce.
+- Na telefonie: telefon i komputer w tej samej sieci Wi-Fi nie wystarcza do GPS (wymaga HTTPS) -
+  do testu na telefonie uzyj Netlify Drop (patrz poprzednia wiadomosc).
