@@ -1,0 +1,38 @@
+# Publishes the Pupil Obok site to GitHub Pages on every push to the main branch of this project.
+name: Publish site (GitHub Pages)
+
+on:
+  push:
+    branches: [pet-sitting-app-plan]
+    paths: ['pet-sitting-app/prototype/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build site
+        run: SITE_ONLY=1 python3 pet-sitting-app/prototype/build_site.py
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: pet-sitting-app/prototype/dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

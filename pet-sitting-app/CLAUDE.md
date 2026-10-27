@@ -41,7 +41,7 @@
 | `docs/product/metrics.md` | Целевые метрики района (10) |
 | **Техника** | |
 | `docs/tech/stack.md` | PWA Next.js + Supabase (Frankfurt), карта, push, вход, оплата, языки (24) |
-| `docs/tech/deploy.md` | Публикация: push в ветку → Netlify сам собирает и выкладывает (`netlify.toml`), одноразовая настройка, правило «push + артефакт» (12) |
+| `docs/tech/deploy.md` | Публикация: push → GitHub Actions → GitHub Pages https://uladshu.github.io/Finish_projects/ (запасной Netlify), одноразовая настройка, правило «push + артефакт» (11) |
 | `docs/tech/db.md` | Карта таблиц и функций по SQL-файлам + чего не хватает (20) |
 | `db/schema.sql`, `db/social.sql`, `db/listings.sql`, `db/survey.sql` | SQL (читать через grep, см. tech/db.md) |
 | `docs/sources.md` | Все источники (32) |

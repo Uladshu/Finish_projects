@@ -14,7 +14,7 @@ head = ('<!doctype html><html lang="pl"><head><meta charset="utf-8">'
 for f in ['streets.json', 'fonts.json', 'wro0.txt', 'wro1.txt', 'wro2.txt', 'wro3.txt']:
     shutil.copy(here / f, dist / f)
 import os
-if os.environ.get('NETLIFY'):  # on the hosting only the site itself is needed
+if os.environ.get('NETLIFY') or os.environ.get('SITE_ONLY'):  # on the hosting only the site itself is needed
     print('dist/ ready for Netlify'); raise SystemExit(0)
 for f in (here / 'launch').iterdir():  # one-click local test: Windows .bat + PowerShell server, Mac/Linux .command, instructions
     shutil.copy(f, dist / f.name)
