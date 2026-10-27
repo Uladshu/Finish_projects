@@ -1,3 +1,5 @@
 wro*.txt
 wro*.bin
 fonts.json
+dist/
+pupilobok-site.zip

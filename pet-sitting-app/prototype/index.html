@@ -682,6 +682,9 @@ Object.assign(T.en, { geoT: 'No access to your location', geoWhy: 'The browser d
   geoPreview: 'This preview always blocks GPS — it will work on pupilobok.pl.', geoRetry: 'Try again', geoLast: (n) => `Use last place: ${n}`,
   geoType: 'Type an address', geoMap: 'Pick on the map', geoTipPaste: 'You can also paste a Google Maps link or coordinates into the address field.', geoTipPhoto: 'Add a photo from your phone — if it has a saved location, we will use it.',
   coordsSug: 'Coordinates', photoLoc: 'We took the place from the photo — check it on the map.' });
+Object.assign(T.pl, { nearMe: 'Pokaż zwierzęta obok mnie', nearWhy: 'Przeglądarka zapyta o zgodę — używamy lokalizacji tylko do pokazania okolicy.' });
+Object.assign(T.ru, { nearMe: 'Показать животных рядом со мной', nearWhy: 'Браузер спросит разрешение — местоположение используем только чтобы показать округу.' });
+Object.assign(T.en, { nearMe: 'Show animals near me', nearWhy: 'Your browser will ask for permission — we only use location to show your area.' });
 // ---------- Example data (not real people or events). `min` = minutes ago ----------
 const L3 = (pl, ru, en) => ({ pl, ru, en });
 const ITEMS = [
@@ -1047,7 +1050,10 @@ function renderChrome() {
     <button id="bnav-menu" aria-current="${tab === 'profile'}">${G.menu}${t.menu}${pend ? `<b>${pend}</b>` : ''}</button>`;
   let cityOk = false; try { cityOk = localStorage.getItem('lapka-city') === 'wroclaw'; } catch (e) {}
   $('citypop').hidden = cityOk || citySeen;
-  if (!$('citypop').hidden) $('citypop').innerHTML = `<div>${t.cityQ}: <b>Wrocław</b>?</div><div class="actions"><button class="btn primary" id="city-yes">${t.yes}</button><button class="btn link" id="city-other">${t.otherCity}</button></div>`;
+  if (!$('citypop').hidden) $('citypop').innerHTML = `<div>${t.cityQ}: <b>Wrocław</b>?</div>
+    <button class="btn primary" id="city-near">${G.loc.replace('<svg', '<svg width="16" height="16" style="fill:currentColor;vertical-align:-3px"')} ${t.nearMe}</button>
+    <small class="count">${t.nearWhy}</small>
+    <div class="actions"><button class="btn" id="city-yes">${t.yes}</button><button class="btn link" id="city-other">${t.otherCity}</button></div>`;
   if (pend) $('tab-profile').textContent = `${t.profile} (${pend})`;
   const p = score(), lv = levelOf(p);
   $('lvl').innerHTML = `<b>${lv + 1}</b><span>${p} ${t.pts}</span>`; $('lvl').title = t.levels[lv];
@@ -1392,6 +1398,11 @@ document.addEventListener('click', async (e) => {
   if (b.dataset.l) { lang = b.dataset.l; save(); renderAll(); if (!$('modal').hidden && draft) { readForm(); draft.sightFor ? openSighting(ITEMS.find((i) => i.id === draft.sightFor)) : openForm(); } }
   else if (b.dataset.tab) { tab = b.dataset.tab; if (selected && !visible().some((i) => i.id === selected)) selected = null; renderAll(); }
   else if (b.dataset.gf) { galF = b.dataset.gf; renderAll(); }
+  else if (b.id === 'city-near') { // the browser's own "allow location?" prompt opens here, after the user's tap
+    citySeen = true; try { localStorage.setItem('lapka-city', 'wroclaw'); } catch (err) {} renderChrome(); toast(t.locating);
+    try { const p = await locate(); rememberPlace(p, await nearestStreet(p.lat, p.lng)); showMe(p); map.flyTo({ center: [p.lng, p.lat], zoom: 15 }); $('toast').hidden = true; if (!inCity(p)) toast(t.outside); }
+    catch (err) { $('toast').hidden = true; geoHelp(false); }
+  }
   else if (b.id === 'city-yes') { citySeen = true; try { localStorage.setItem('lapka-city', 'wroclaw'); } catch (err) {} renderChrome(); }
   else if (b.id === 'city-other') { citySeen = true; renderChrome(); toast(t.otherMsg); }
   else if (b.id === 'bnav-add') { draft = null; startReport('lost'); }
@@ -1614,6 +1625,9 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && fOpen &&
 
 renderChrome(); renderList();
 initMap();
+try { navigator.permissions && navigator.permissions.query({ name: 'geolocation' }).then((st) => {
+  if (st.state === 'granted') locate().then((p) => { const go = () => { showMe(p); map.flyTo({ center: [p.lng, p.lat], zoom: 14.5 }); }; map.loaded() ? go() : map.once('load', go); }).catch(() => {});
+}).catch(() => {}); } catch (e) {}
 { const q = ITEMS.find((i) => isOwn(i) && lifecycle(i).state === 'asked'); if (q) setTimeout(() => toast(T[lang].pollToast(titleOf(q))), 1500); }
 new ResizeObserver(() => map && map.resize()).observe(document.querySelector('.mapwrap'));
 </script>
