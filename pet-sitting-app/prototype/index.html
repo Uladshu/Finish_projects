@@ -63,6 +63,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .fbtn b { display: grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-size: 11px; }
 .fbtn[aria-expanded="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
 .fpanel { display: grid; gap: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg); }
+.fhead { display: flex; align-items: center; gap: 10px; }
+.fhead b { font-family: var(--f-display); font-weight: 600; font-size: 16px; }
+.fhead .btn { padding: 7px 12px; }
 .factions { display: flex; gap: 8px; justify-content: space-between; }
 .factions .btn.primary { flex: 1; }
 .search input { flex: 1; min-width: 0; border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 8px 11px; font-size: 14px; }
@@ -262,6 +265,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
       <div id="filters" class="head" style="padding:0;border:0">
         <div class="search"><input id="q" type="search" autocomplete="off"><button class="fbtn" id="ftoggle" aria-expanded="false" aria-controls="fpanel"></button></div>
         <div class="fpanel" id="fpanel" hidden>
+          <div class="fhead"><button class="btn" id="fback"></button><b id="t-ftitle"></b></div>
           <div class="lbl" id="t-which"></div>
           <div class="species" id="species"></div>
           <div class="chips" id="types"></div>
@@ -514,9 +518,9 @@ Object.assign(T.en, { whereL: 'Where?', wherePh: 'Type a street, district or par
   geoFail: 'Could not get your location. This preview blocks GPS — it will work in the app. Type an address or pick the point on the map.',
   outside: 'You are outside Wrocław — check the point on the map.', kinds: { s: 'street', p: 'district', o: 'place' }, pointSet: (n) => `Point set: ${n}`,
   pickAdjust: 'Check the point: tap the map or drag the pin to adjust.', publishHere: 'Publish here', myLoc: 'My location', next2: 'Next: check on the map' });
-Object.assign(T.pl, { filters: 'Filtry', freset: 'Wyczyść', show: (n) => `Pokaż (${n})` });
-Object.assign(T.ru, { filters: 'Фильтры', freset: 'Сбросить', show: (n) => `Показать (${n})` });
-Object.assign(T.en, { filters: 'Filters', freset: 'Reset', show: (n) => `Show (${n})` });
+Object.assign(T.pl, { back: '← Wstecz', backTitle: 'Wróć bez zmian', filters: 'Filtry', freset: 'Wyczyść', show: (n) => `Pokaż (${n})` });
+Object.assign(T.ru, { back: '← Назад', backTitle: 'Вернуться без изменений', filters: 'Фильтры', freset: 'Сбросить', show: (n) => `Показать (${n})` });
+Object.assign(T.en, { back: '← Back', backTitle: 'Go back without changes', filters: 'Filters', freset: 'Reset', show: (n) => `Show (${n})` });
 // ---------- Example data (not real people or events). `min` = minutes ago ----------
 const L3 = (pl, ru, en) => ({ pl, ru, en });
 const ITEMS = [
@@ -706,7 +710,10 @@ function queryMatch(it) {
   return query.toLowerCase().split(/\s+/).every((w) => hay.includes(w));
 }
 const baseVisible = (it) => live(it) && speciesMatch(it) && periodMatch(it) && queryMatch(it);
-let galF = 'all', fOpen = false;
+let galF = 'all', fOpen = false, fSnap = null;
+// Filters panel: opening remembers the current filters so "Back" can restore them
+const snapFilters = () => ({ species, period, galF, on: { ...on } });
+function cancelFilters() { if (fSnap) { ({ species, period, galF } = fSnap); Object.assign(on, fSnap.on); } fSnap = null; fOpen = false; renderAll(); }
 const inGallery = (i) => (i.type === 'found' || i.type === 'seen') && (galF === 'all' || i.type === galF);
 const visible = () => ITEMS.filter((i) => (tab === 'gallery' ? inGallery(i) : on[i.type]) && baseVisible(i));
 
@@ -829,6 +836,7 @@ function renderChrome() {
   const nAct = (species !== 'all') + (period !== 'all') + (tab === 'gallery' ? galF !== 'all' : Object.values(on).some((v) => !v));
   $('ftoggle').innerHTML = `${G.filter}${t.filters}${nAct ? `<b>${nAct}</b>` : ''}`;
   $('ftoggle').setAttribute('aria-expanded', String(fOpen)); $('fpanel').hidden = !fOpen;
+  $('fback').textContent = t.back; $('fback').title = t.backTitle; $('t-ftitle').textContent = t.filters;
   $('freset').textContent = t.freset; $('fdone').textContent = t.show(visible().length); $('t-sample').textContent = t.sample;
   $('species').innerHTML = SPECIES.map((s) => `<button class="sp" id="sp-${s}" data-sp="${s}" aria-pressed="${species === s}">${spGlyph(s)}${t.sp[s]}</button>`).join('');
   if (tab === 'gallery') $('types').innerHTML = ['all', 'found', 'seen'].map((k) => {
@@ -1162,8 +1170,9 @@ document.addEventListener('click', async (e) => {
   if (b.dataset.l) { lang = b.dataset.l; save(); renderAll(); if (!$('modal').hidden && draft) { readForm(); draft.sightFor ? openSighting(ITEMS.find((i) => i.id === draft.sightFor)) : openForm(); } }
   else if (b.dataset.tab) { tab = b.dataset.tab; if (selected && !visible().some((i) => i.id === selected)) selected = null; renderAll(); }
   else if (b.dataset.gf) { galF = b.dataset.gf; renderAll(); }
-  else if (b.id === 'ftoggle') { fOpen = !fOpen; renderChrome(); }
-  else if (b.id === 'fdone') { fOpen = false; renderChrome(); }
+  else if (b.id === 'ftoggle') { if (!fOpen) fSnap = snapFilters(); fOpen = !fOpen; renderChrome(); }
+  else if (b.id === 'fdone') { fOpen = false; fSnap = null; renderChrome(); }
+  else if (b.id === 'fback') cancelFilters();
   else if (b.id === 'freset') { species = 'all'; period = 'all'; galF = 'all'; Object.keys(on).forEach((k) => { on[k] = true; }); renderAll(); }
   else if (b.dataset.sp) { species = b.dataset.sp; if (selected && !visible().some((i) => i.id === selected)) selected = null; renderAll(); }
   else if (b.dataset.k) { on[b.dataset.k] = !on[b.dataset.k]; renderChrome(); renderList(); drawMap(); }
@@ -1290,7 +1299,7 @@ document.addEventListener('input', async (e) => {
 });
 $('q').addEventListener('input', (e) => { query = e.target.value.trim(); renderChrome(); renderList(); drawMap(); });
 $('modal').addEventListener('click', (e) => { if (e.target === $('modal')) { $('modal').hidden = true; draft = null; } });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { $('modal').hidden = true; $('lightbox').hidden = true; if (pick) { endPick(); draft = null; } } });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && fOpen && $('modal').hidden) { cancelFilters(); return; } if (e.key === 'Escape') { $('modal').hidden = true; $('lightbox').hidden = true; if (pick) { endPick(); draft = null; } } });
 
 renderChrome(); renderList();
 initMap();
