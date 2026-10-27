@@ -291,6 +291,10 @@ body { font-weight: 500; font-size: 14px; }
 .step:not(:last-child)::after { content: ""; position: absolute; left: 16px; top: 32px; bottom: 0; border-left: 2px dotted var(--accent); }
 .step span { font-size: 13px; line-height: 1.45; padding-top: 5px; }
 .bnav { display: none; }
+.sbanner { display: flex; align-items: center; gap: 10px; margin: 8px 4px 6px; padding: 10px 10px 10px 14px; border: 2px dashed var(--accent); border-radius: 10px; font-size: 13px; font-weight: 600; }
+.sbanner span { flex: 1; min-width: 0; }
+.sbanner .btn { padding: 7px 12px; font-size: 13px; white-space: nowrap; }
+.sbanner .x { width: 26px; height: 26px; font-size: 15px; }
 .msheet-bg { place-items: end stretch; padding: 0; }
 .msheet { background: var(--panel); border-radius: 18px 18px 0 0; padding-block: 18px calc(16px + env(safe-area-inset-bottom, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 4px; max-height: 85vh; overflow-y: auto; }
 .msheet .mrow { display: flex; align-items: center; gap: 14px; width: 100%; border: 0; border-bottom: 1px solid var(--line); background: none; padding: 14px 4px; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer; color: var(--ink); }
@@ -385,6 +389,8 @@ body { font-weight: 500; font-size: 14px; }
 <script src="https://cdn.jsdelivr.net/npm/@protomaps/basemaps@5.7.2/dist/basemaps.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
+// Google Form for tester feedback (see docs/research/survey.md); empty = show the questions preview
+const FORM_URL = '';
 const svg = (d, extra = '') => `<svg viewBox="0 0 24 24"${extra}>${d}</svg>`;
 const G = {
   paw: svg('<ellipse cx="12" cy="16.2" rx="5.2" ry="4.3"/><ellipse cx="5.2" cy="10.2" rx="2.1" ry="2.6"/><ellipse cx="9.4" cy="6.1" rx="2.1" ry="2.7"/><ellipse cx="14.6" cy="6.1" rx="2.1" ry="2.7"/><ellipse cx="18.8" cy="10.2" rx="2.1" ry="2.6"/>'),
@@ -610,11 +616,14 @@ Object.assign(T.en, { whereL: 'Where?', wherePh: 'Type a street, district or par
 Object.assign(T.pl, { back: '← Wstecz', backTitle: 'Wróć bez zmian', filters: 'Filtry', freset: 'Wyczyść', show: (n) => `Pokaż (${n})` });
 Object.assign(T.ru, { back: '← Назад', backTitle: 'Вернуться без изменений', filters: 'Фильтры', freset: 'Сбросить', show: (n) => `Показать (${n})` });
 Object.assign(T.en, { back: '← Back', backTitle: 'Go back without changes', filters: 'Filters', freset: 'Reset', show: (n) => `Show (${n})` });
-Object.assign(T.pl, { menu: 'Menu', mProfile: 'Mój profil i łapki', mPosts: 'Moje ogłoszenia', mLang: 'Język', mCity: 'Miasto', mAbout: 'O aplikacji', aboutTxt: 'Łapka — sąsiedzka pomoc dla właścicieli zwierząt we Wrocławiu. To jest prototyp: dane są przykładowe.', close: 'Zamknij', cityQ: 'Twoje miasto', yes: 'Tak', otherCity: 'Wybierz inne miasto', otherMsg: 'Na start działamy we Wrocławiu. Inne miasta wkrótce — zapiszemy Cię na listę oczekujących.',
+Object.assign(T.pl, { survey: 'Ankieta — 2 minuty', surveyBanner: 'Testujesz prototyp? Powiedz nam, co myślisz', surveyGo: 'Ankieta 2 min', surveyPending: 'Formularz ankiety zostanie podłączony wkrótce. Pytania:',
+  surveyQs: ['Jakie masz zwierzę?', 'W jakiej dzielnicy mieszkasz?', 'Gdzie szukałeś pomocy, gdy zgubiło się lub znalazłeś zwierzę?', 'Co było najtrudniejsze?', 'Ocena prototypu 1–5', 'Z czego skorzystałbyś najpierw?', 'Czego brakuje?', 'E-mail do zaproszenia (opcjonalnie)'], menu: 'Menu', mProfile: 'Mój profil i łapki', mPosts: 'Moje ogłoszenia', mLang: 'Język', mCity: 'Miasto', mAbout: 'O aplikacji', aboutTxt: 'Łapka — sąsiedzka pomoc dla właścicieli zwierząt we Wrocławiu. To jest prototyp: dane są przykładowe.', close: 'Zamknij', cityQ: 'Twoje miasto', yes: 'Tak', otherCity: 'Wybierz inne miasto', otherMsg: 'Na start działamy we Wrocławiu. Inne miasta wkrótce — zapiszemy Cię na listę oczekujących.',
   stepsT: 'Jak szukać swojego zwierzęcia?', steps: ['W filtrach wybierz gatunek i okres', 'Przejrzyj zdjęcia znalezionych i widzianych zwierząt', 'Kliknij zdjęcie — zobaczysz miejsce na mapie', 'Napisz „To moje zwierzę?” i umów się na odbiór'] });
-Object.assign(T.ru, { menu: 'Меню', mProfile: 'Мой профиль и лапки', mPosts: 'Мои объявления', mLang: 'Язык', mCity: 'Город', mAbout: 'О приложении', aboutTxt: 'Łapka — соседская помощь владельцам животных во Вроцлаве. Это прототип: данные — примеры.', close: 'Закрыть', cityQ: 'Ваш город', yes: 'Да', otherCity: 'Выбрать другой город', otherMsg: 'На старте работаем во Вроцлаве. Другие города скоро — запишем вас в лист ожидания.',
+Object.assign(T.ru, { survey: 'Опрос — 2 минуты', surveyBanner: 'Тестируете прототип? Расскажите, что думаете', surveyGo: 'Опрос 2 мин', surveyPending: 'Форма опроса скоро будет подключена. Вопросы:',
+  surveyQs: ['Какое у вас животное?', 'В каком районе живёте?', 'Где искали помощь, когда терялось или находилось животное?', 'Что было сложнее всего?', 'Оценка прототипа 1–5', 'Чем воспользовались бы в первую очередь?', 'Чего не хватает?', 'Email для приглашения (по желанию)'], menu: 'Меню', mProfile: 'Мой профиль и лапки', mPosts: 'Мои объявления', mLang: 'Язык', mCity: 'Город', mAbout: 'О приложении', aboutTxt: 'Łapka — соседская помощь владельцам животных во Вроцлаве. Это прототип: данные — примеры.', close: 'Закрыть', cityQ: 'Ваш город', yes: 'Да', otherCity: 'Выбрать другой город', otherMsg: 'На старте работаем во Вроцлаве. Другие города скоро — запишем вас в лист ожидания.',
   stepsT: 'Как найти своё животное?', steps: ['В фильтрах выберите вид и период', 'Пролистайте фото найденных и замеченных животных', 'Нажмите на фото — увидите место на карте', 'Напишите «Это моё животное?» и договоритесь о встрече'] });
-Object.assign(T.en, { menu: 'Menu', mProfile: 'My profile and paws', mPosts: 'My posts', mLang: 'Language', mCity: 'City', mAbout: 'About', aboutTxt: 'Łapka — neighbourly help for pet owners in Wrocław. This is a prototype: data are examples.', close: 'Close', cityQ: 'Your city', yes: 'Yes', otherCity: 'Choose another city', otherMsg: 'We start in Wrocław. Other cities soon — we will add you to the waiting list.',
+Object.assign(T.en, { survey: 'Survey — 2 minutes', surveyBanner: 'Testing the prototype? Tell us what you think', surveyGo: '2-min survey', surveyPending: 'The survey form will be connected soon. Questions:',
+  surveyQs: ['Which pet do you have?', 'Which district do you live in?', 'Where did you look for help when a pet was lost or found?', 'What was the hardest part?', 'Prototype rating 1–5', 'What would you use first?', 'What is missing?', 'Email for an invite (optional)'], menu: 'Menu', mProfile: 'My profile and paws', mPosts: 'My posts', mLang: 'Language', mCity: 'City', mAbout: 'About', aboutTxt: 'Łapka — neighbourly help for pet owners in Wrocław. This is a prototype: data are examples.', close: 'Close', cityQ: 'Your city', yes: 'Yes', otherCity: 'Choose another city', otherMsg: 'We start in Wrocław. Other cities soon — we will add you to the waiting list.',
   stepsT: 'How to find your pet?', steps: ['In filters pick the species and period', 'Browse photos of found and spotted animals', 'Tap a photo to see the place on the map', 'Write “Is this my pet?” and arrange the pickup'] });
 // ---------- Example data (not real people or events). `min` = minutes ago ----------
 const L3 = (pl, ru, en) => ({ pl, ru, en });
@@ -805,7 +814,14 @@ function queryMatch(it) {
   return query.toLowerCase().split(/\s+/).every((w) => hay.includes(w));
 }
 const baseVisible = (it) => live(it) && speciesMatch(it) && periodMatch(it) && queryMatch(it);
-let galF = 'all', fOpen = false, fSnap = null, citySeen = false;
+let galF = 'all', fOpen = false, fSnap = null, citySeen = false, surveyHidden = false;
+try { surveyHidden = localStorage.getItem('lapka-survey') === 'hidden'; } catch (e) {}
+function openSurvey() {
+  const t = T[lang];
+  $('modal-body').innerHTML = `<div class="fhead" style="justify-content:space-between"><h2>${t.survey}</h2><button class="x" id="nf-cancel" aria-label="${t.close}">×</button></div>
+    ${FORM_URL ? `<a class="btn primary" style="text-align:center;text-decoration:none" href="${FORM_URL}" target="_blank" rel="noopener">${t.surveyGo} →</a>` : `<p class="note">${t.surveyPending}</p>`}<ol style="margin:0;padding-left:20px;display:grid;gap:6px;line-height:1.4">${t.surveyQs.map((q) => `<li>${q}</li>`).join('')}</ol>`;
+  $('modal').hidden = false;
+}
 // Filters panel: opening remembers the current filters so "Back" can restore them
 const snapFilters = () => ({ species, period, galF, on: { ...on } });
 function openMenu() {
@@ -815,6 +831,7 @@ function openMenu() {
     <button class="mrow" data-menu="posts">${G.box}${t.mPosts}${pend ? `<b>${pend}</b>` : ''}</button>
     <div class="mlangs">${G.all.replace('<svg', '<svg width="0" height="0" style="display:none"')}${t.mLang}: ${['pl', 'ru', 'en'].map((l) => `<button data-ml="${l}" aria-pressed="${lang === l}">${l.toUpperCase()}</button>`).join('')}</div>
     <button class="mrow" data-menu="city">${G.loc}${t.mCity}<small>Wrocław</small></button>
+    <button class="mrow" data-menu="survey">${G.eye}${t.survey}</button>
     <button class="mrow" data-menu="about">${G.heart}${t.mAbout}</button>`;
   $('menu').hidden = false;
 }
@@ -1007,7 +1024,8 @@ function renderList() {
   }
   const order = { lost: 0, seen: 1, found: 2, hazard: 3, help: 4, give: 5, place: 6 };
   const rows = visible().sort((a, b) => (order[a.type] - order[b.type]) || ((confirmedAt(b) ?? 0) - (confirmedAt(a) ?? 0)));
-  $('list').innerHTML = rows.length ? rows.map((it) => {
+  const banner = surveyHidden ? '' : `<div class="sbanner"><span>${t.surveyBanner}</span><button class="btn primary" data-survey="1">${t.surveyGo}</button><button class="x" data-survey="0" aria-label="${t.close}">×</button></div>`;
+  $('list').innerHTML = banner + (rows.length ? rows.map((it) => {
     const meta = [];
     if (it.at) meta.push(fmtDate(it.at) + ' · ' + t.ago(minsAgo(it.at)));
     if (it.confirmedAt && it.confirmedAt > it.at) meta.push(`${t.refreshed} ${fmtDate(it.confirmedAt)}`);
@@ -1021,7 +1039,7 @@ function renderList() {
     if (it.price) meta.push(`<span class="badge">${t.prices[it.price]}</span>`);
     return `<button class="item${selected === it.id ? ' on' : ''}" data-id="${it.id}" style="--c:${TYPES[it.type].c}">${thumbHTML(it)}
       <span style="min-width:0"><span class="kind">${t.type1[it.type]}${ANIMAL(it.type) ? ' · ' + t.sp1[it.species] : ''}</span><h3>${esc(titleOf(it))}</h3><p>${esc(tx(it.desc))}</p><span class="meta">${meta.join('<span aria-hidden="true">·</span>')}</span></span></button>`;
-  }).join('') : `<div class="empty">${t.empty}</div>`;
+  }).join('') : `<div class="empty">${t.empty}</div>`);
 }
 function renderProfile() {
   const t = T[lang], p = score(), lv = levelOf(p), next = LEVELS[lv + 1];
@@ -1287,11 +1305,13 @@ document.addEventListener('click', async (e) => {
   else if (b.id === 'city-other') { citySeen = true; renderChrome(); toast(t.otherMsg); }
   else if (b.id === 'bnav-add') { draft = null; startReport('lost'); }
   else if (b.id === 'bnav-menu') openMenu();
+  else if (b.dataset.survey) { if (b.dataset.survey === '1') openSurvey(); else { surveyHidden = true; try { localStorage.setItem('lapka-survey', 'hidden'); } catch (err) {} renderList(); } }
   else if (b.dataset.menu) {
     const m = b.dataset.menu; $('menu').hidden = true;
     if (m === 'profile' || m === 'posts') { tab = 'profile'; renderAll(); }
     else if (m === 'city') { citySeen = false; try { localStorage.removeItem('lapka-city'); } catch (err) {} renderChrome(); }
     else if (m === 'about') toast(t.aboutTxt);
+    else if (m === 'survey') openSurvey();
   }
   else if (b.dataset.ml) { lang = b.dataset.ml; save(); renderAll(); openMenu(); }
   else if (b.id === 'ftoggle') { if (!fOpen) fSnap = snapFilters(); fOpen = !fOpen; renderChrome(); }
