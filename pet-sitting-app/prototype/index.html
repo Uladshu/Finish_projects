@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<title>Łapka Sąsiedzka</title>
+<title>Pupil Obok</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap">
@@ -250,7 +250,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 body { font-weight: 500; font-size: 14px; }
 .brand h1.logo { display: flex; align-items: center; gap: 6px; font-family: var(--f-display); font-weight: 800; font-size: 16px; letter-spacing: .02em; text-transform: uppercase; }
 .brand h1.logo svg { width: 22px; height: 22px; fill: var(--accent); }
-.brand h1.logo span { color: var(--accent); }
+.brand h1.logo span { color: var(--accent); margin-left: .28em; }
 .tabs { gap: 18px; border-bottom: 1px solid var(--line); }
 .tabs button { flex: none; border: 0; border-radius: 0; background: none; padding: 8px 0 9px; color: var(--muted); font-size: 14px; border-bottom: 3px solid transparent; margin-bottom: -1px; }
 .tabs button[aria-selected="true"] { background: none; color: var(--ink); border-bottom-color: var(--accent); }
@@ -291,6 +291,20 @@ body { font-weight: 500; font-size: 14px; }
 .step:not(:last-child)::after { content: ""; position: absolute; left: 16px; top: 32px; bottom: 0; border-left: 2px dotted var(--accent); }
 .step span { font-size: 13px; line-height: 1.45; padding-top: 5px; }
 .bnav { display: none; }
+.svcard { margin: 8px 4px 10px; padding: 14px; border: 2px solid var(--accent); border-radius: 12px; display: grid; gap: 10px; background: color-mix(in srgb, var(--accent) 4%, var(--panel)); }
+.svtop { display: flex; align-items: center; gap: 10px; }
+.svhead { font-size: 12px; font-weight: 600; color: var(--muted); flex: 1; min-width: 0; }
+.svdots { display: flex; gap: 4px; } .svdots i { width: 18px; height: 4px; border-radius: 2px; background: var(--line); } .svdots i.done { background: var(--accent); } .svdots i.now { background: var(--ink); }
+.svtop .x { width: 26px; height: 26px; font-size: 15px; }
+.svq { font-size: 16px; font-weight: 700; line-height: 1.3; }
+.svopts { display: flex; flex-wrap: wrap; gap: 6px; }
+.svopt { border: 1.5px solid var(--ink); background: var(--panel); border-radius: 999px; padding: 7px 13px; font-weight: 600; font-size: 13px; cursor: pointer; }
+.svopt[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.svopt.star { color: #e6a700; border-color: var(--line); letter-spacing: -1px; }
+.svopt.star:hover { border-color: #e6a700; }
+.svtext { display: flex; gap: 6px; } .svtext input { flex: 1; min-width: 0; border: 1.5px solid var(--ink); border-radius: 999px; padding: 8px 14px; font-size: 14px; background: var(--panel); }
+.svfoot { display: flex; } .svfoot .btn[disabled] { opacity: .4; cursor: default; }
+.svskip { justify-self: start; font-size: 12px; padding: 0 2px; }
 .sbanner { display: flex; align-items: center; gap: 10px; margin: 8px 4px 6px; padding: 10px 10px 10px 14px; border: 2px dashed var(--accent); border-radius: 10px; font-size: 13px; font-weight: 600; }
 .sbanner span { flex: 1; min-width: 0; }
 .sbanner .btn { padding: 7px 12px; font-size: 13px; white-space: nowrap; }
@@ -338,7 +352,7 @@ body { font-weight: 500; font-size: 14px; }
   <aside class="panel">
     <div class="head">
       <div class="brand">
-        <h1 class="logo"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="16.2" rx="5.2" ry="4.3"/><ellipse cx="5.2" cy="10.2" rx="2.1" ry="2.6"/><ellipse cx="9.4" cy="6.1" rx="2.1" ry="2.7"/><ellipse cx="14.6" cy="6.1" rx="2.1" ry="2.7"/><ellipse cx="18.8" cy="10.2" rx="2.1" ry="2.6"/></svg>Łapka<span>.Wrocław</span></h1>
+        <h1 class="logo"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="16.2" rx="5.2" ry="4.3"/><ellipse cx="5.2" cy="10.2" rx="2.1" ry="2.6"/><ellipse cx="9.4" cy="6.1" rx="2.1" ry="2.7"/><ellipse cx="14.6" cy="6.1" rx="2.1" ry="2.7"/><ellipse cx="18.8" cy="10.2" rx="2.1" ry="2.6"/></svg>Pupil<span>Obok</span></h1>
         <button class="lvl" id="lvl"></button>
         <div class="langs" role="group" aria-label="Language">
           <button id="lang-pl" data-l="pl">PL</button><button id="lang-ru" data-l="ru">RU</button><button id="lang-en" data-l="en">EN</button>
@@ -389,8 +403,21 @@ body { font-weight: 500; font-size: 14px; }
 <script src="https://cdn.jsdelivr.net/npm/@protomaps/basemaps@5.7.2/dist/basemaps.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
-// Google Form for tester feedback (see docs/research/survey.md); empty = show the questions preview
-const FORM_URL = '';
+// Micro-survey: 3 random questions per person from SURVEY_POOL; each answer is saved the moment it is given.
+// Storage: SURVEY_API (own backend, e.g. Supabase REST — works when the page is hosted on pupilobok.pl),
+// else the artifact's shared db (signed-in testers with Contributor access), and always this browser.
+const SURVEY_API = { url: '', key: '' };
+const SURVEY_POOL = [
+  { id: 'pet', multi: true, opts: ['dog', 'cat', 'bird', 'rodent', 'reptile', 'fish', 'none'] },
+  { id: 'lost_before', opts: ['lost', 'found', 'both', 'never'] },
+  { id: 'where_help', multi: true, opts: ['fb', 'posters', 'olx', 'shelter', 'vet', 'app'] },
+  { id: 'rating', scale: 5 },
+  { id: 'first_use', multi: true, opts: ['lostfound', 'gallery', 'poison', 'help', 'give', 'groups'] },
+  { id: 'recommend', opts: ['yes', 'maybe', 'no'] },
+  { id: 'would_help', opts: ['free', 'paid', 'no'] },
+  { id: 'district', opts: ['stare', 'srodmiescie', 'krzyki', 'fabryczna', 'psiepole', 'outside'] },
+  { id: 'missing', text: true }
+];
 const svg = (d, extra = '') => `<svg viewBox="0 0 24 24"${extra}>${d}</svg>`;
 const G = {
   paw: svg('<ellipse cx="12" cy="16.2" rx="5.2" ry="4.3"/><ellipse cx="5.2" cy="10.2" rx="2.1" ry="2.6"/><ellipse cx="9.4" cy="6.1" rx="2.1" ry="2.7"/><ellipse cx="14.6" cy="6.1" rx="2.1" ry="2.7"/><ellipse cx="18.8" cy="10.2" rx="2.1" ry="2.6"/>'),
@@ -564,7 +591,7 @@ Object.assign(T.pl, { claimBtn: 'Znalazłem — jest u mnie', you: 'Ty', ownerCo
   ownAsked: (d) => `Czy to ogłoszenie jest nadal aktualne? Odpowiedz do ${d}, inaczej zniknie.`,
   stillActive: 'Nadal aktualne', resolved: 'Znalezione / nieaktualne', republish: 'Opublikuj ponownie',
   myPosts: 'Moje ogłoszenia', stActive: (d) => `Aktywne · następne pytanie ${d}`, stAsked: (d) => `Pytamy: nadal aktualne? Odpowiedz do ${d}`, stExpired: 'Wygasło — brak odpowiedzi', stClosed: 'Zamknięte',
-  pollToast: (title) => `Pytanie od Łapki: czy „${title}” jest nadal aktualne? Odpowiedz w profilu.`, confirmedToast: (d) => `Dziękujemy! Data odświeżona, kolejne pytanie ${d}.`, closedToast: 'Ogłoszenie zamknięte. Dziękujemy!',
+  pollToast: (title) => `Pytanie od Pupil Obok: czy „${title}” jest nadal aktualne? Odpowiedz w profilu.`, confirmedToast: (d) => `Dziękujemy! Data odświeżona, kolejne pytanie ${d}.`, closedToast: 'Ogłoszenie zamknięte. Dziękujemy!',
   demoTime: 'Demo: przewiń czas, żeby zobaczyć pytania i wygasanie', plusDay: '+1 dzień', resetTime: 'Teraz', simNow: (d) => `Czas w prototypie: ${d}`,
   left: (m) => m < 60 ? `${Math.max(1, Math.round(m))} min` : m < 1440 ? `${Math.round(m / 60)} godz.` : `${Math.round(m / 1440)} dni` });
 Object.assign(T.ru, { claimBtn: 'Я нашёл — он у меня', you: 'Вы', ownerConfirm: 'Подтверждаю — вернулся домой', ownerReject: 'Это не моё животное', demoOwner: 'Демо: хозяин подтверждает',
@@ -578,7 +605,7 @@ Object.assign(T.ru, { claimBtn: 'Я нашёл — он у меня', you: 'Вы
   ownAsked: (d) => `Объявление ещё актуально? Ответьте до ${d}, иначе оно исчезнет.`,
   stillActive: 'Ещё актуально', resolved: 'Нашёлся / неактуально', republish: 'Опубликовать снова',
   myPosts: 'Мои объявления', stActive: (d) => `Активно · следующий вопрос ${d}`, stAsked: (d) => `Вопрос: ещё актуально? Ответьте до ${d}`, stExpired: 'Исчезло — не было ответа', stClosed: 'Закрыто',
-  pollToast: (title) => `Вопрос от Лапки: «${title}» ещё актуально? Ответьте в профиле.`, confirmedToast: (d) => `Спасибо! Дата обновлена, следующий вопрос ${d}.`, closedToast: 'Объявление закрыто. Спасибо!',
+  pollToast: (title) => `Вопрос от Pupil Obok: «${title}» ещё актуально? Ответьте в профиле.`, confirmedToast: (d) => `Спасибо! Дата обновлена, следующий вопрос ${d}.`, closedToast: 'Объявление закрыто. Спасибо!',
   demoTime: 'Демо: перемотайте время, чтобы увидеть вопросы и исчезновение', plusDay: '+1 день', resetTime: 'Сейчас', simNow: (d) => `Время в прототипе: ${d}`,
   left: (m) => m < 60 ? `${Math.max(1, Math.round(m))} мин` : m < 1440 ? `${Math.round(m / 60)} ч` : `${Math.round(m / 1440)} дн.` });
 Object.assign(T.en, { claimBtn: 'I found it — it’s with me', you: 'You', ownerConfirm: 'Confirm — back home', ownerReject: 'Not my pet', demoOwner: 'Demo: owner confirms',
@@ -592,7 +619,7 @@ Object.assign(T.en, { claimBtn: 'I found it — it’s with me', you: 'You', own
   ownAsked: (d) => `Is this post still current? Answer by ${d} or it disappears.`,
   stillActive: 'Still current', resolved: 'Found / not current', republish: 'Publish again',
   myPosts: 'My posts', stActive: (d) => `Active · next question ${d}`, stAsked: (d) => `Still current? Answer by ${d}`, stExpired: 'Expired — no answer', stClosed: 'Closed',
-  pollToast: (title) => `Question from Łapka: is “${title}” still current? Answer in your profile.`, confirmedToast: (d) => `Thanks! Date refreshed, next question ${d}.`, closedToast: 'Post closed. Thank you!',
+  pollToast: (title) => `Question from Pupil Obok: is “${title}” still current? Answer in your profile.`, confirmedToast: (d) => `Thanks! Date refreshed, next question ${d}.`, closedToast: 'Post closed. Thank you!',
   demoTime: 'Demo: move time forward to see questions and expiry', plusDay: '+1 day', resetTime: 'Now', simNow: (d) => `Prototype time: ${d}`,
   left: (m) => m < 60 ? `${Math.max(1, Math.round(m))} min` : m < 1440 ? `${Math.round(m / 60)} h` : `${Math.round(m / 1440)} days` });
 Object.assign(T.pl, { gallery: 'Galeria', galNote: 'Znalezione i widziane zwierzęta. Szukasz swojego? Przejrzyj zdjęcia — kliknij, żeby zobaczyć miejsce na mapie.', galAll: 'Wszystkie', galEmpty: 'Brak znalezionych ani widzianych zwierząt dla tych filtrów.',
@@ -617,14 +644,23 @@ Object.assign(T.pl, { back: '← Wstecz', backTitle: 'Wróć bez zmian', filters
 Object.assign(T.ru, { back: '← Назад', backTitle: 'Вернуться без изменений', filters: 'Фильтры', freset: 'Сбросить', show: (n) => `Показать (${n})` });
 Object.assign(T.en, { back: '← Back', backTitle: 'Go back without changes', filters: 'Filters', freset: 'Reset', show: (n) => `Show (${n})` });
 Object.assign(T.pl, { survey: 'Ankieta — 2 minuty', surveyBanner: 'Testujesz prototyp? Powiedz nam, co myślisz', surveyGo: 'Ankieta 2 min', surveyPending: 'Formularz ankiety zostanie podłączony wkrótce. Pytania:',
-  surveyQs: ['Jakie masz zwierzę?', 'W jakiej dzielnicy mieszkasz?', 'Gdzie szukałeś pomocy, gdy zgubiło się lub znalazłeś zwierzę?', 'Co było najtrudniejsze?', 'Ocena prototypu 1–5', 'Z czego skorzystałbyś najpierw?', 'Czego brakuje?', 'E-mail do zaproszenia (opcjonalnie)'], menu: 'Menu', mProfile: 'Mój profil i łapki', mPosts: 'Moje ogłoszenia', mLang: 'Język', mCity: 'Miasto', mAbout: 'O aplikacji', aboutTxt: 'Łapka — sąsiedzka pomoc dla właścicieli zwierząt we Wrocławiu. To jest prototyp: dane są przykładowe.', close: 'Zamknij', cityQ: 'Twoje miasto', yes: 'Tak', otherCity: 'Wybierz inne miasto', otherMsg: 'Na start działamy we Wrocławiu. Inne miasta wkrótce — zapiszemy Cię na listę oczekujących.',
+  surveyQs: ['Jakie masz zwierzę?', 'W jakiej dzielnicy mieszkasz?', 'Gdzie szukałeś pomocy, gdy zgubiło się lub znalazłeś zwierzę?', 'Co było najtrudniejsze?', 'Ocena prototypu 1–5', 'Z czego skorzystałbyś najpierw?', 'Czego brakuje?', 'E-mail do zaproszenia (opcjonalnie)'], menu: 'Menu', mProfile: 'Mój profil i łapki', mPosts: 'Moje ogłoszenia', mLang: 'Język', mCity: 'Miasto', mAbout: 'O aplikacji', aboutTxt: 'Pupil Obok — sąsiedzka pomoc dla właścicieli zwierząt we Wrocławiu. To jest prototyp: dane są przykładowe.', close: 'Zamknij', cityQ: 'Twoje miasto', yes: 'Tak', otherCity: 'Wybierz inne miasto', otherMsg: 'Na start działamy we Wrocławiu. Inne miasta wkrótce — zapiszemy Cię na listę oczekujących.',
   stepsT: 'Jak szukać swojego zwierzęcia?', steps: ['W filtrach wybierz gatunek i okres', 'Przejrzyj zdjęcia znalezionych i widzianych zwierząt', 'Kliknij zdjęcie — zobaczysz miejsce na mapie', 'Napisz „To moje zwierzę?” i umów się na odbiór'] });
 Object.assign(T.ru, { survey: 'Опрос — 2 минуты', surveyBanner: 'Тестируете прототип? Расскажите, что думаете', surveyGo: 'Опрос 2 мин', surveyPending: 'Форма опроса скоро будет подключена. Вопросы:',
-  surveyQs: ['Какое у вас животное?', 'В каком районе живёте?', 'Где искали помощь, когда терялось или находилось животное?', 'Что было сложнее всего?', 'Оценка прототипа 1–5', 'Чем воспользовались бы в первую очередь?', 'Чего не хватает?', 'Email для приглашения (по желанию)'], menu: 'Меню', mProfile: 'Мой профиль и лапки', mPosts: 'Мои объявления', mLang: 'Язык', mCity: 'Город', mAbout: 'О приложении', aboutTxt: 'Łapka — соседская помощь владельцам животных во Вроцлаве. Это прототип: данные — примеры.', close: 'Закрыть', cityQ: 'Ваш город', yes: 'Да', otherCity: 'Выбрать другой город', otherMsg: 'На старте работаем во Вроцлаве. Другие города скоро — запишем вас в лист ожидания.',
+  surveyQs: ['Какое у вас животное?', 'В каком районе живёте?', 'Где искали помощь, когда терялось или находилось животное?', 'Что было сложнее всего?', 'Оценка прототипа 1–5', 'Чем воспользовались бы в первую очередь?', 'Чего не хватает?', 'Email для приглашения (по желанию)'], menu: 'Меню', mProfile: 'Мой профиль и лапки', mPosts: 'Мои объявления', mLang: 'Язык', mCity: 'Город', mAbout: 'О приложении', aboutTxt: 'Pupil Obok — соседская помощь владельцам животных во Вроцлаве. Это прототип: данные — примеры.', close: 'Закрыть', cityQ: 'Ваш город', yes: 'Да', otherCity: 'Выбрать другой город', otherMsg: 'На старте работаем во Вроцлаве. Другие города скоро — запишем вас в лист ожидания.',
   stepsT: 'Как найти своё животное?', steps: ['В фильтрах выберите вид и период', 'Пролистайте фото найденных и замеченных животных', 'Нажмите на фото — увидите место на карте', 'Напишите «Это моё животное?» и договоритесь о встрече'] });
 Object.assign(T.en, { survey: 'Survey — 2 minutes', surveyBanner: 'Testing the prototype? Tell us what you think', surveyGo: '2-min survey', surveyPending: 'The survey form will be connected soon. Questions:',
-  surveyQs: ['Which pet do you have?', 'Which district do you live in?', 'Where did you look for help when a pet was lost or found?', 'What was the hardest part?', 'Prototype rating 1–5', 'What would you use first?', 'What is missing?', 'Email for an invite (optional)'], menu: 'Menu', mProfile: 'My profile and paws', mPosts: 'My posts', mLang: 'Language', mCity: 'City', mAbout: 'About', aboutTxt: 'Łapka — neighbourly help for pet owners in Wrocław. This is a prototype: data are examples.', close: 'Close', cityQ: 'Your city', yes: 'Yes', otherCity: 'Choose another city', otherMsg: 'We start in Wrocław. Other cities soon — we will add you to the waiting list.',
+  surveyQs: ['Which pet do you have?', 'Which district do you live in?', 'Where did you look for help when a pet was lost or found?', 'What was the hardest part?', 'Prototype rating 1–5', 'What would you use first?', 'What is missing?', 'Email for an invite (optional)'], menu: 'Menu', mProfile: 'My profile and paws', mPosts: 'My posts', mLang: 'Language', mCity: 'City', mAbout: 'About', aboutTxt: 'Pupil Obok — neighbourly help for pet owners in Wrocław. This is a prototype: data are examples.', close: 'Close', cityQ: 'Your city', yes: 'Yes', otherCity: 'Choose another city', otherMsg: 'We start in Wrocław. Other cities soon — we will add you to the waiting list.',
   stepsT: 'How to find your pet?', steps: ['In filters pick the species and period', 'Browse photos of found and spotted animals', 'Tap a photo to see the place on the map', 'Write “Is this my pet?” and arrange the pickup'] });
+Object.assign(T.pl, { svHead: 'Pomóż nam ulepszyć Pupil Obok', svNext: 'Dalej', svSkip: 'Pomiń', svThanks: 'Dziękujemy! Twoje odpowiedzi są zapisane.', svPh: 'Napisz krótko…', svMenu: 'Pytania do Ciebie',
+  svQ: { pet: 'Jakie masz zwierzę?', lost_before: 'Czy zgubiło Ci się kiedyś zwierzę albo znalazłeś cudze?', where_help: 'Gdzie szukałbyś pomocy, gdy zginie zwierzę?', rating: 'Jak oceniasz tę aplikację?', first_use: 'Z czego skorzystałbyś najpierw?', recommend: 'Poleciłbyś ją znajomym?', would_help: 'Pomógłbyś sąsiadowi z jego zwierzęciem?', district: 'Gdzie mieszkasz?', missing: 'Czego tu brakuje?' },
+  svO: { dog: 'Pies', cat: 'Kot', bird: 'Ptak', rodent: 'Gryzoń / królik', reptile: 'Gad', fish: 'Ryby', none: 'Nie mam', lost: 'Zgubiło się', found: 'Znalazłem', both: 'Jedno i drugie', never: 'Nigdy', fb: 'Grupy FB', posters: 'Plakaty', olx: 'OLX', shelter: 'Schronisko / straż', vet: 'Weterynarz', app: 'Aplikacja', lostfound: 'Zaginione / znalezione', gallery: 'Galeria znalezionych', poison: 'Ostrzeżenia o trutkach', help: 'Pomoc sąsiadów', give: 'Oddam / przyjmę', groups: 'Grupy', yes: 'Tak', maybe: 'Może', no: 'Nie', free: 'Tak, za darmo', paid: 'Tak, za opłatą', stare: 'Stare Miasto', srodmiescie: 'Śródmieście', krzyki: 'Krzyki', fabryczna: 'Fabryczna', psiepole: 'Psie Pole', outside: 'Poza Wrocławiem' } });
+Object.assign(T.ru, { svHead: 'Помогите улучшить Pupil Obok', svNext: 'Дальше', svSkip: 'Пропустить', svThanks: 'Спасибо! Ваши ответы сохранены.', svPh: 'Коротко напишите…', svMenu: 'Вопросы для вас',
+  svQ: { pet: 'Какое у вас животное?', lost_before: 'Терялось ли у вас животное или находили чужое?', where_help: 'Где искали бы помощь, если пропадёт животное?', rating: 'Как оцениваете приложение?', first_use: 'Чем воспользовались бы в первую очередь?', recommend: 'Посоветовали бы знакомым?', would_help: 'Помогли бы соседу с его животным?', district: 'Где вы живёте?', missing: 'Чего здесь не хватает?' },
+  svO: { dog: 'Собака', cat: 'Кошка', bird: 'Птица', rodent: 'Грызун / кролик', reptile: 'Рептилия', fish: 'Рыбы', none: 'Нет животного', lost: 'Терялось', found: 'Находил', both: 'И то и другое', never: 'Никогда', fb: 'Группы FB', posters: 'Объявления', olx: 'OLX', shelter: 'Приют / стража', vet: 'Ветеринар', app: 'Приложение', lostfound: 'Пропали / найдены', gallery: 'Галерея найденных', poison: 'Предупреждения об отраве', help: 'Помощь соседей', give: 'Отдам / приму', groups: 'Группы', yes: 'Да', maybe: 'Может быть', no: 'Нет', free: 'Да, бесплатно', paid: 'Да, за плату', stare: 'Старый город', srodmiescie: 'Средместье', krzyki: 'Крыки', fabryczna: 'Фабрична', psiepole: 'Псе Поле', outside: 'Не во Вроцлаве' } });
+Object.assign(T.en, { svHead: 'Help us improve Pupil Obok', svNext: 'Next', svSkip: 'Skip', svThanks: 'Thank you! Your answers are saved.', svPh: 'Write briefly…', svMenu: 'Questions for you',
+  svQ: { pet: 'Which pet do you have?', lost_before: 'Have you ever lost a pet or found someone else\'s?', where_help: 'Where would you look for help if a pet went missing?', rating: 'How do you rate this app?', first_use: 'What would you use first?', recommend: 'Would you recommend it to friends?', would_help: 'Would you help a neighbour with their pet?', district: 'Where do you live?', missing: 'What is missing here?' },
+  svO: { dog: 'Dog', cat: 'Cat', bird: 'Bird', rodent: 'Rodent / rabbit', reptile: 'Reptile', fish: 'Fish', none: 'No pet', lost: 'Lost one', found: 'Found one', both: 'Both', never: 'Never', fb: 'FB groups', posters: 'Posters', olx: 'OLX', shelter: 'Shelter / city guard', vet: 'Vet', app: 'An app', lostfound: 'Lost / found', gallery: 'Found gallery', poison: 'Poison alerts', help: 'Neighbour help', give: 'Give away / need', groups: 'Groups', yes: 'Yes', maybe: 'Maybe', no: 'No', free: 'Yes, for free', paid: 'Yes, paid', stare: 'Old Town', srodmiescie: 'Śródmieście', krzyki: 'Krzyki', fabryczna: 'Fabryczna', psiepole: 'Psie Pole', outside: 'Outside Wrocław' } });
 // ---------- Example data (not real people or events). `min` = minutes ago ----------
 const L3 = (pl, ru, en) => ({ pl, ru, en });
 const ITEMS = [
@@ -815,13 +851,47 @@ function queryMatch(it) {
 }
 const baseVisible = (it) => live(it) && speciesMatch(it) && periodMatch(it) && queryMatch(it);
 let galF = 'all', fOpen = false, fSnap = null, citySeen = false, surveyHidden = false;
-try { surveyHidden = localStorage.getItem('lapka-survey') === 'hidden'; } catch (e) {}
-function openSurvey() {
-  const t = T[lang];
-  $('modal-body').innerHTML = `<div class="fhead" style="justify-content:space-between"><h2>${t.survey}</h2><button class="x" id="nf-cancel" aria-label="${t.close}">×</button></div>
-    ${FORM_URL ? `<a class="btn primary" style="text-align:center;text-decoration:none" href="${FORM_URL}" target="_blank" rel="noopener">${t.surveyGo} →</a>` : `<p class="note">${t.surveyPending}</p>`}<ol style="margin:0;padding-left:20px;display:grid;gap:6px;line-height:1.4">${t.surveyQs.map((q) => `<li>${q}</li>`).join('')}</ol>`;
-  $('modal').hidden = false;
+let SV = null;
+try { SV = JSON.parse(localStorage.getItem('pupil-survey') || 'null'); surveyHidden = !!(SV && SV.hidden); } catch (e) {}
+if (!SV || !SV.qs) {
+  const pool = SURVEY_POOL.map((q) => q.id).sort(() => Math.random() - .5);
+  SV = { rid: (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2)), qs: pool.slice(0, 3), answers: {}, pick: [] };
 }
+const svStep = () => SV.qs.findIndex((q) => !(q in SV.answers));
+let svDb = null, svUid = null;
+(async () => { // shared store for signed-in testers; absent for public visitors
+  try { if (!window.claude) return; const [db, user] = await Promise.all([claude.use('db'), claude.use('user')]); if (db && user) { svUid = await user.id(); svDb = svUid ? db : null; } } catch (e) {}
+})();
+async function saveAnswer(qid) {
+  try { localStorage.setItem('pupil-survey', JSON.stringify(SV)); } catch (e) {}
+  const answer = SV.answers[qid];
+  if (SURVEY_API.url) {
+    try { await fetch(`${SURVEY_API.url}/rest/v1/survey_answers?on_conflict=respondent_id,question_id`, { method: 'POST',
+      headers: { apikey: SURVEY_API.key, Authorization: `Bearer ${SURVEY_API.key}`, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
+      body: JSON.stringify({ respondent_id: SV.rid, question_id: qid, answer, lang }) }); } catch (e) {}
+  }
+  if (svDb && svUid) { try { await svDb.doc(`survey/${svUid}`).set({ rid: SV.rid, lang, qs: SV.qs, answers: SV.answers, updatedAt: new Date().toISOString() }); } catch (e) {} }
+}
+function surveyCard() {
+  const t = T[lang], i = svStep();
+  if (surveyHidden) return '';
+  if (i < 0) return SV.thanksShown ? '' : `<div class="svcard"><div class="svtop"><b>${t.svThanks}</b><button class="x" data-sv="close" aria-label="${t.close}">×</button></div></div>`;
+  const q = SURVEY_POOL.find((x) => x.id === SV.qs[i]);
+  const dots = SV.qs.map((_, k) => `<i class="${k < i ? 'done' : k === i ? 'now' : ''}"></i>`).join('');
+  let body;
+  if (q.scale) body = `<div class="svopts">${Array.from({ length: q.scale }, (_, k) => `<button class="svopt star" data-sva="${k + 1}">${'★'.repeat(k + 1)}</button>`).join('')}</div>`;
+  else if (q.text) body = `<div class="svtext"><input id="sv-text" placeholder="${t.svPh}" autocomplete="off"><button class="btn primary" data-sv="text">${t.svNext}</button></div>`;
+  else body = `<div class="svopts">${q.opts.map((o) => `<button class="svopt" data-sva="${o}" aria-pressed="${SV.pick.includes(o)}">${t.svO[o]}</button>`).join('')}</div>${q.multi ? `<div class="svfoot"><button class="btn primary" data-sv="multi"${SV.pick.length ? '' : ' disabled'}>${t.svNext}</button></div>` : ''}`;
+  return `<div class="svcard"><div class="svtop"><span class="svhead">${t.svHead} · ${i + 1}/3</span><span class="svdots">${dots}</span><button class="x" data-sv="close" aria-label="${t.close}">×</button></div>
+    <div class="svq">${t.svQ[q.id]}</div>${body}<button class="btn link svskip" data-sv="skip">${t.svSkip}</button></div>`;
+}
+function svAnswer(value) {
+  const qid = SV.qs[svStep()]; SV.answers[qid] = value; SV.pick = [];
+  saveAnswer(qid);
+  if (svStep() < 0) setTimeout(() => { SV.thanksShown = true; try { localStorage.setItem('pupil-survey', JSON.stringify(SV)); } catch (e) {} renderList(); }, 2500);
+  renderList();
+}
+function openSurvey() { surveyHidden = false; if (SV.hidden) { SV.hidden = false; try { localStorage.setItem('pupil-survey', JSON.stringify(SV)); } catch (e) {} } tab = 'feed'; renderAll(); $('list').scrollTop = 0; }
 // Filters panel: opening remembers the current filters so "Back" can restore them
 const snapFilters = () => ({ species, period, galF, on: { ...on } });
 function openMenu() {
@@ -831,7 +901,7 @@ function openMenu() {
     <button class="mrow" data-menu="posts">${G.box}${t.mPosts}${pend ? `<b>${pend}</b>` : ''}</button>
     <div class="mlangs">${G.all.replace('<svg', '<svg width="0" height="0" style="display:none"')}${t.mLang}: ${['pl', 'ru', 'en'].map((l) => `<button data-ml="${l}" aria-pressed="${lang === l}">${l.toUpperCase()}</button>`).join('')}</div>
     <button class="mrow" data-menu="city">${G.loc}${t.mCity}<small>Wrocław</small></button>
-    <button class="mrow" data-menu="survey">${G.eye}${t.survey}</button>
+    <button class="mrow" data-menu="survey">${G.eye}${t.svMenu}</button>
     <button class="mrow" data-menu="about">${G.heart}${t.mAbout}</button>`;
   $('menu').hidden = false;
 }
@@ -1024,7 +1094,7 @@ function renderList() {
   }
   const order = { lost: 0, seen: 1, found: 2, hazard: 3, help: 4, give: 5, place: 6 };
   const rows = visible().sort((a, b) => (order[a.type] - order[b.type]) || ((confirmedAt(b) ?? 0) - (confirmedAt(a) ?? 0)));
-  const banner = surveyHidden ? '' : `<div class="sbanner"><span>${t.surveyBanner}</span><button class="btn primary" data-survey="1">${t.surveyGo}</button><button class="x" data-survey="0" aria-label="${t.close}">×</button></div>`;
+  const banner = surveyCard();
   $('list').innerHTML = banner + (rows.length ? rows.map((it) => {
     const meta = [];
     if (it.at) meta.push(fmtDate(it.at) + ' · ' + t.ago(minsAgo(it.at)));
@@ -1305,7 +1375,18 @@ document.addEventListener('click', async (e) => {
   else if (b.id === 'city-other') { citySeen = true; renderChrome(); toast(t.otherMsg); }
   else if (b.id === 'bnav-add') { draft = null; startReport('lost'); }
   else if (b.id === 'bnav-menu') openMenu();
-  else if (b.dataset.survey) { if (b.dataset.survey === '1') openSurvey(); else { surveyHidden = true; try { localStorage.setItem('lapka-survey', 'hidden'); } catch (err) {} renderList(); } }
+  else if (b.dataset.sva != null) {
+    const qid = SV.qs[svStep()], q = SURVEY_POOL.find((x) => x.id === qid), v = b.dataset.sva;
+    if (q.multi) { SV.pick = SV.pick.includes(v) ? SV.pick.filter((x) => x !== v) : [...SV.pick, v]; renderList(); }
+    else svAnswer(q.scale ? Number(v) : v);
+  }
+  else if (b.dataset.sv) {
+    const a = b.dataset.sv;
+    if (a === 'multi') svAnswer(SV.pick.slice());
+    else if (a === 'text') { const v = ($('sv-text').value || '').trim(); svAnswer(v || null); }
+    else if (a === 'skip') svAnswer(null);
+    else if (a === 'close') { surveyHidden = true; SV.hidden = true; if (svStep() < 0) SV.thanksShown = true; try { localStorage.setItem('pupil-survey', JSON.stringify(SV)); } catch (err) {} renderList(); }
+  }
   else if (b.dataset.menu) {
     const m = b.dataset.menu; $('menu').hidden = true;
     if (m === 'profile' || m === 'posts') { tab = 'profile'; renderAll(); }
@@ -1421,10 +1502,10 @@ function openPoster(it) {
       <div class="nm">${esc(it.name || tx(it.breed) || T.pl.sp1[it.species])}</div>
       <div style="font-size:14px;line-height:1.45;text-align:center">${esc([tx(it.color), tx(it.desc)].filter(Boolean).join('. '))}</div>
       <div style="font-size:13px;text-align:center"><b>${esc(it.street || '')}</b> · ${fmtDate(it.at)}${it.reward ? ` · Nagroda: ${esc(it.reward)}` : ''}</div>
-      <div class="pbottom"><div>${t.posterContact}<br><b>lapka.example/z/${it.id}</b></div><div class="qr" id="qr"></div></div></div>
+      <div class="pbottom"><div>${t.posterContact}<br><b>pupilobok.pl/z/${it.id}</b></div><div class="qr" id="qr"></div></div></div>
     <p class="note">${t.posterNote}</p>`;
   $('modal').hidden = false;
-  try { new QRCode($('qr'), { text: `https://lapka.example/z/${it.id}`, width: 208, height: 208, correctLevel: QRCode.CorrectLevel.M }); } catch (e) {}
+  try { new QRCode($('qr'), { text: `https://pupilobok.pl/z/${it.id}`, width: 208, height: 208, correctLevel: QRCode.CorrectLevel.M }); } catch (e) {}
 }
 document.addEventListener('change', async (e) => {
   if (e.target.id === 'ph-input') {

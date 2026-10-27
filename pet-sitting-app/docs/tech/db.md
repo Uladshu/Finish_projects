@@ -10,6 +10,8 @@
 | `social.sql` | `pets` +совместимость; `profiles` +`home_location`, приватность; `friendships`, `are_friends()`; `walks`, `walk_pets`, `walk_participants`, `walk_live_positions`, `fuzz_point()`, `update_walk_position()`, `end_walk()`, `expire_walks()`, `nearby_live_walks()`; `places`; `hazard_reports`, `hazard_confirmations`; `lost_found_alerts`, `users_to_notify()`; `help_points_ledger`, `help_points_balance`; `bookings.mode` | Соцсеть, живая карта с приватностью, опасности, потерялся/нашёлся, баллы |
 | `listings.sql` | `profiles` +«Мой дом», надёжность, скрытие `phone`/`home_location` через column grants; `profile_level()`; `listings`, `listing_pets`, `listing_responses`, `price_offers`, `make_price_offer()`; `bookings` +поля договорённости; `propose_agreement()`, `confirm_agreement()`, `get_contact()`, `search_listings()`, `price_hint()`, `matching_users_for_listing()` | Присмотр по модели BlaBlaCar |
 
+| `survey.sql` | `survey_answers(respondent_id, question_id, answer jsonb, lang)` + RLS: аноним только вставляет/обновляет | Ответы мини-опроса |
+
 ## Чего ещё нет (нужно для соцсети-первой версии)
 - Группы и участники, посты ленты (вопрос / помощь / отдам / фото), комментарии, реакции.
 - Генерация плакатов о потере (PDF + QR).
